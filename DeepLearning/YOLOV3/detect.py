@@ -10,14 +10,22 @@ from yolov3_tf2.models import (
 from yolov3_tf2.dataset import transform_images, load_tfrecord_dataset
 from yolov3_tf2.utils import draw_outputs
 
+# 라벨 파일 경로
 flags.DEFINE_string('classes', './data/coco.names', 'path to classes file')
+# 모델 가중치 경로
 flags.DEFINE_string('weights', './checkpoints/yolov3.tf',
                     'path to weights file')
+# 타이니 욜로 모드
 flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
+# 이미지 리사이즈
 flags.DEFINE_integer('size', 416, 'resize images to')
+# 추론 이미지
 flags.DEFINE_string('image', './data/girl.png', 'path to input image')
+# 추론 TFRecord 포맷(이미지 대신)
 flags.DEFINE_string('tfrecord', None, 'tfrecord instead of image')
+# 출력 결과 저장 경로
 flags.DEFINE_string('output', './output.jpg', 'path to output image')
+# 분류 클래스 개수
 flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
 
 

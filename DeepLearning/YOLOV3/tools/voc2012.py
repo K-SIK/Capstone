@@ -8,11 +8,15 @@ import tensorflow as tf
 import lxml.etree
 import tqdm
 
+# 데이터 경로
 flags.DEFINE_string('data_dir', './data/voc2012_raw/VOCdevkit/VOC2012/',
                     'path to raw PASCAL VOC dataset')
+# train/val split
 flags.DEFINE_enum('split', 'train', [
-                  'train', 'val'], 'specify train or val spit')
-flags.DEFINE_string('output_file', './data/voc2012_train.tfrecord', 'outpot dataset')
+                  'train', 'val'], 'specify train or val split')
+# 아웃풋 포맷 
+flags.DEFINE_string('output_file', './data/voc2012_train.tfrecord', 'output dataset')
+# 라벨 파일
 flags.DEFINE_string('classes', './data/voc2012.names', 'classes file')
 
 
@@ -87,14 +91,17 @@ def parse_xml(xml):
 
 
 def main(_argv):
+    # 라벨 데이터 로드
     class_map = {name: idx for idx, name in enumerate(
         open(FLAGS.classes).read().splitlines())}
     logging.info("Class mapping loaded: %s", class_map)
-
+    
+    # TFRecord 포맷 writer
     writer = tf.io.TFRecordWriter(FLAGS.output_file)
     image_list = open(os.path.join(
         FLAGS.data_dir, 'ImageSets', 'Main', '%s.txt' % FLAGS.split)).read().splitlines()
     logging.info("Image list loaded: %d", len(image_list))
+    
     for name in tqdm.tqdm(image_list):
         annotation_xml = os.path.join(
             FLAGS.data_dir, 'Annotations', name + '.xml')
