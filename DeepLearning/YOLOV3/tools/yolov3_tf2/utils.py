@@ -98,7 +98,7 @@ def broadcast_iou(box_1, box_2):
         (box_2[..., 3] - box_2[..., 1])
     return int_area / (box_1_area + box_2_area - int_area)
 
-
+# 이미지(넘파이 객체), 출력값(boxes, scores, classes, nums), 라벨명을 전달하면 결과 이미지를 출력
 def draw_outputs(img, outputs, class_names):
     boxes, objectness, classes, nums = outputs
     boxes, objectness, classes, nums = boxes[0], objectness[0], classes[0], nums[0]
@@ -133,3 +133,6 @@ def freeze_all(model, frozen=True):
     if isinstance(model, tf.keras.Model):
         for l in model.layers:
             freeze_all(l, frozen)
+            
+            
+

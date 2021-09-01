@@ -30,6 +30,8 @@ flags.DEFINE_string('weights', './checkpoints/yolov3.tf',
                     'path to weights file')
 # 라벨 파일 경로
 flags.DEFINE_string('classes', './data/coco.names', 'path to classes file')
+# 분류 클래스 수
+flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
 # 학습 모드
 flags.DEFINE_enum('mode', 'fit', ['fit', 'eager_fit', 'eager_tf'],
                   'fit: model.fit, '
@@ -51,8 +53,6 @@ flags.DEFINE_integer('epochs', 2, 'number of epochs')
 flags.DEFINE_integer('batch_size', 8, 'batch size')
 # 학습률
 flags.DEFINE_float('learning_rate', 1e-3, 'learning rate')
-# 분류 클래스 수
-flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
 # 원하는 출력 크기와 다른 모델로부터 전이 학습을 할 때 사용
 flags.DEFINE_integer('weights_num_classes', None, 'specify num class for `weights` file if different, '
                      'useful in transfer learning with different number of classes')

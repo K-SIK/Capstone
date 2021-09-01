@@ -69,7 +69,7 @@ def transform_targets(y_train, anchors, anchor_masks, size):
 
     return tuple(y_outs)
 
-
+# 이미지를 리사이즈하고 0~1 사이의 값으로 변환
 def transform_images(x_train, size):
     x_train = tf.image.resize(x_train, (size, size))
     x_train = x_train / 255
@@ -78,6 +78,7 @@ def transform_images(x_train, size):
 
 # https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/using_your_own_dataset.md#conversion-script-outline-conversion-script-outline
 # Commented out fields are not required in our project
+# 객체 검출에 필요한 특징만 추출
 IMAGE_FEATURE_MAP = {
     # 'image/width': tf.io.FixedLenFeature([], tf.int64),
     # 'image/height': tf.io.FixedLenFeature([], tf.int64),
@@ -97,7 +98,7 @@ IMAGE_FEATURE_MAP = {
     # 'image/object/view': tf.io.VarLenFeature(tf.string),
 }
 
-
+# TFRecord 포맷 데이터를 전달하면 훈련 데이터 셋으로 가공
 def parse_tfrecord(tfrecord, class_table, size):
     x = tf.io.parse_single_example(tfrecord, IMAGE_FEATURE_MAP)
     x_train = tf.image.decode_jpeg(x['image/encoded'], channels=3)
@@ -117,7 +118,7 @@ def parse_tfrecord(tfrecord, class_table, size):
 
     return x_train, y_train
 
-
+# TFRecord 포맷 데이터 로딩
 def load_tfrecord_dataset(file_pattern, class_file, size=416):
     LINE_NUMBER = -1  # TODO: use tf.lookup.TextFileIndex.LINE_NUMBER
     class_table = tf.lookup.StaticHashTable(tf.lookup.TextFileInitializer(
@@ -127,7 +128,7 @@ def load_tfrecord_dataset(file_pattern, class_file, size=416):
     dataset = files.flat_map(tf.data.TFRecordDataset)
     return dataset.map(lambda x: parse_tfrecord(x, class_table, size))
 
-
+# 랜덤 데이터 로딩
 def load_fake_dataset():
     x_train = tf.image.decode_jpeg(
         open('./data/girl.png', 'rb').read(), channels=3)
