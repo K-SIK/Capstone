@@ -4,19 +4,26 @@ from absl.flags import FLAGS
 import cv2
 import numpy as np
 import tensorflow as tf
+
+# from ..yolov3_tf2 import models, dataset, utils
+
 from yolov3_tf2.models import (
     YoloV3, YoloV3Tiny
 )
 from yolov3_tf2.dataset import load_tfrecord_dataset, transform_images
 from yolov3_tf2.utils import draw_outputs
 
+# 라벨 데이터 경로
 flags.DEFINE_string('classes', './data/coco.names', 'path to classes file')
+# 이미지 리사이즈 사이즈
 flags.DEFINE_integer('size', 416, 'resize images to')
+# 데이터셋 경로
 flags.DEFINE_string(
     'dataset', './data/voc2012_train.tfrecord', 'path to dataset')
+# 출력 데이터 경로
 flags.DEFINE_string('output', './output.jpg', 'path to output image')
 
-
+# TFRecord에서 로드된 이미지 데이터들 중 하나의 랜덤한 이미지를 출력
 def main(_argv):
     class_names = [c.strip() for c in open(FLAGS.classes).readlines()]
     logging.info('classes loaded')

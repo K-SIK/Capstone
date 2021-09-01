@@ -19,16 +19,25 @@ from yolov3_tf2.models import (
 from yolov3_tf2.utils import freeze_all
 import yolov3_tf2.dataset as dataset
 
+# 학습 데이터셋 경로
 flags.DEFINE_string('dataset', '', 'path to dataset')
+# 검증 데이터셋 경로
 flags.DEFINE_string('val_dataset', '', 'path to validation dataset')
+# 타이니 욜로 모드
 flags.DEFINE_boolean('tiny', False, 'yolov3 or yolov3-tiny')
+# 모델 가중치 경로
 flags.DEFINE_string('weights', './checkpoints/yolov3.tf',
                     'path to weights file')
+# 라벨 파일 경로
 flags.DEFINE_string('classes', './data/coco.names', 'path to classes file')
+# 분류 클래스 수
+flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
+# 학습 모드
 flags.DEFINE_enum('mode', 'fit', ['fit', 'eager_fit', 'eager_tf'],
                   'fit: model.fit, '
                   'eager_fit: model.fit(run_eagerly=True), '
                   'eager_tf: custom GradientTape')
+# 학습 모드
 flags.DEFINE_enum('transfer', 'none',
                   ['none', 'darknet', 'no_output', 'frozen', 'fine_tune'],
                   'none: Training from scratch, '
@@ -36,13 +45,18 @@ flags.DEFINE_enum('transfer', 'none',
                   'no_output: Transfer all but output, '
                   'frozen: Transfer and freeze all, '
                   'fine_tune: Transfer all and freeze darknet only')
+# 입력 이미지 요구 크기
 flags.DEFINE_integer('size', 416, 'image size')
+# 에포크 수
 flags.DEFINE_integer('epochs', 2, 'number of epochs')
+# 배치 사이즈
 flags.DEFINE_integer('batch_size', 8, 'batch size')
+# 학습률
 flags.DEFINE_float('learning_rate', 1e-3, 'learning rate')
-flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
+# 원하는 출력 크기와 다른 모델로부터 전이 학습을 할 때 사용
 flags.DEFINE_integer('weights_num_classes', None, 'specify num class for `weights` file if different, '
                      'useful in transfer learning with different number of classes')
+# 멀티 GPU
 flags.DEFINE_boolean('multi_gpu', False, 'Use if wishing to train with more than 1 GPU.')
 
 
