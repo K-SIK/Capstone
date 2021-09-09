@@ -36,6 +36,7 @@ def build_example(annotation, sub_path, class_map):
     ''' 전달받은 annotation 딕셔너리를 이용해 해당 이미지에 대한 정보들을 이용'''
     # 이미지 파일 경로.파일명 ex) FLAGS.data_dir/JPEGImages/2007_000027.jpg
     img_path = DATA_PATH + '/images/koreanfood/Images' + '/' + sub_path + '/' + annotation['filename']
+    print('sub_path: ', sub_path)
     '''
     img_path = os.path.join(
         FLAGS.data_dir, 'JPEGImages', annotation['filename'])
@@ -158,7 +159,7 @@ def main(_argv):
             print(path)
             for xml_file in os.listdir(path):
                 if os.path.splitext(xml_file)[1][1:] != 'xml': continue
-                print(os.path.splitext(xml_file)[1][1:])
+                # print(os.path.splitext(xml_file)[1][1:])
                 # 어노테이션 파일 경로
                 annotation_xml = path + '/' + xml_file
                 # 어노테이션 파일 읽기
@@ -166,7 +167,7 @@ def main(_argv):
                 # 읽은 어노테이션 파일을 파싱, 'annotation' key에 해당하는 것만 가져옴
                 annotation = parse_xml(annotation_xml)['annotation']
                 # tf.Example 객체 생성
-                tf_example = build_example(annotation, sub_dir[len(ANNOTATION_PATH)+1:], class_map)
+                tf_example = build_example(annotation, path[len(ANNOTATION_PATH)+1:], class_map)
                 # TFRecord 파일로 저장
                 writer.write(tf_example.SerializeToString())
 
