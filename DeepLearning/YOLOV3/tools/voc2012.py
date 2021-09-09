@@ -37,22 +37,22 @@ def build_example(annotation, class_map):
     ymax = []
     classes = []
     classes_text = []
-    truncated = []
-    views = []
-    difficult_obj = []
+    # truncated = []
+    # views = []
+    # difficult_obj = []
     if 'object' in annotation:
         for obj in annotation['object']:
             difficult = bool(int(obj['difficult']))
-            difficult_obj.append(int(difficult))
+            # difficult_obj.append(int(difficult))
 
             xmin.append(float(obj['bndbox']['xmin']) / width)
             ymin.append(float(obj['bndbox']['ymin']) / height)
             xmax.append(float(obj['bndbox']['xmax']) / width)
             ymax.append(float(obj['bndbox']['ymax']) / height)
             classes_text.append(obj['name'].encode('utf8'))
-            classes.append(class_map[obj['name']])
-            truncated.append(int(obj['truncated']))
-            views.append(obj['pose'].encode('utf8'))
+            classes.append(class_map[obj['name']]) # 인덱스로 append
+            # truncated.append(int(obj['truncated']))
+            # views.append(obj['pose'].encode('utf8'))
 
     example = tf.train.Example(features=tf.train.Features(feature={
         'image/height': tf.train.Feature(int64_list=tf.train.Int64List(value=[height])),
@@ -70,9 +70,9 @@ def build_example(annotation, class_map):
         'image/object/bbox/ymax': tf.train.Feature(float_list=tf.train.FloatList(value=ymax)),
         'image/object/class/text': tf.train.Feature(bytes_list=tf.train.BytesList(value=classes_text)),
         'image/object/class/label': tf.train.Feature(int64_list=tf.train.Int64List(value=classes)),
-        'image/object/difficult': tf.train.Feature(int64_list=tf.train.Int64List(value=difficult_obj)),
-        'image/object/truncated': tf.train.Feature(int64_list=tf.train.Int64List(value=truncated)),
-        'image/object/view': tf.train.Feature(bytes_list=tf.train.BytesList(value=views)),
+        # 'image/object/difficult': tf.train.Feature(int64_list=tf.train.Int64List(value=difficult_obj)),
+        # 'image/object/truncated': tf.train.Feature(int64_list=tf.train.Int64List(value=truncated)),
+        # 'image/object/view': tf.train.Feature(bytes_list=tf.train.BytesList(value=views)),
     }))
     return example
 
@@ -94,6 +94,7 @@ def parse_xml(xml):
 
 # 어노테이션 파일(xml)을 TFRecord 파일로 변환하여 저장 
 def main(_argv):
+    
     # 라벨 데이터 로드
     class_map = {name: idx for idx, name in enumerate(
         open(FLAGS.classes).read().splitlines())}
