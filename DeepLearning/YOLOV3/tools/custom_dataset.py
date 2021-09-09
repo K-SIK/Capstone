@@ -16,7 +16,7 @@ flags.DEFINE_string('data_dir', DATA_PATH + '/images/koreanfood',
                     'path to custom dataset(korean food)')
 # # train/val split
 # VOC 데이터셋에는 train/val을 여러 종류로 나눌 수 있게 하도록 파일명을 묶어서 저장한 txt 파일이 있는데, 그것을 전달
-flags.DEFINE_enum('split', 'train', ['train', 'val'],
+flags.DEFINE_enum('split', 'Training', ['Training', 'Validation'],
                   'specify train or val split')
 
 # 아웃풋 경로.포맷
@@ -31,12 +31,15 @@ flags.DEFINE_string('classes', DATA_PATH + '/images/koreanfood/koreanfood.names'
 # 매 이미지파일마다 호출
 # TFRecord로 저장하기 알맞은 형태로 변환
 # <annotation> 태그와 <object> 태그 안에 어떤 태그들이 있는 지 중요!!!
-def build_example(annotation, class_map):
+def build_example(annotation, sub_path, class_map):
     ''' 해당 소스 코드는 VOC 데이터셋에 커스텀된 코드임. (수정 필요!!!) '''
     ''' 전달받은 annotation 딕셔너리를 이용해 해당 이미지에 대한 정보들을 이용'''
     # 이미지 파일 경로.파일명 ex) FLAGS.data_dir/JPEGImages/2007_000027.jpg
+    img_path = DATA_PATH + '/images/koreanfood/Images' + '/' + sub_path + '/' + annotation['filename']
+    '''
     img_path = os.path.join(
         FLAGS.data_dir, 'JPEGImages', annotation['filename'])
+    '''
     # 이미지 읽어오기
     img_raw = open(img_path, 'rb').read()
     key = hashlib.sha256(img_raw).hexdigest()
@@ -126,19 +129,51 @@ def parse_xml(xml):
 def main(_argv):
     # 라벨 데이터 로드
     class_map = {name: idx for idx, name in enumerate(
-        open(FLAGS.classes).read().splitlines())}
+        open(FLAGS.classes, encoding='UTF8').read().splitlines())}
     logging.info("Class mapping loaded: %s", class_map)
     
     # TFRecord 포맷 writer
     writer = tf.io.TFRecordWriter(FLAGS.output_file)
-    # # VOC 데이터셋의 ImageSets/Main/<FLAGS.split>.txt 에 있는 파일명들을 가져옴
-    # # ImageSets 폴더는 VOC 데이터셋을 train/validation 데이터셋으로 나눌 때 나누기 쉽게 이미지 파일명들을 모아 놓은 txt 파일들이 존재함. 
-    # image_list = open(os.path.join(
-    #     FLAGS.data_dir, 'ImageSets', 'Main', '%s.txt' % FLAGS.split)).read().splitlines()
-    # logging.info("Image list loaded: %d", len(image_list))
+    '''
+    # VOC 데이터셋의 ImageSets/Main/<FLAGS.split>.txt 에 있는 파일명들을 가져옴
+    # ImageSets 폴더는 VOC 데이터셋을 train/validation 데이터셋으로 나눌 때 나누기 쉽게 이미지 파일명들을 모아 놓은 txt 파일들이 존재함. 
+    image_list = open(os.path.join(
+        FLAGS.data_dir, 'ImageSets', 'Main', '%s.txt' % FLAGS.split)).read().splitlines()
+    logging.info("Image list loaded: %d", len(image_list))
+    '''
     
     # 각 이미지 파일명에 대해 해당 파일명의 어노테이션 파일을 파싱하여 TFRecord로 저장
     # Train/Val 데이터셋을 만들 어노테이션 파일들이 필요함
+
+    # [이미지] Images/Training(Validation)/TRAIN_0XX(VAL_0XX)/분류 디렉터리/*.jpg
+    # [라벨] Annotations/Training(Validation)/TRAIN_0XX(VAL_0XX)/분류 디렉터리/*.xml
+    # 결국 최초 진입 디렉터리인 Images/Annotations 경로만 다르고 그 아래로는 동일 경로(포맷은 당연히 jpg/xml로 다름)
+    ANNOTATION_PATH = DATA_PATH + '/images/koreanfood/Annotations'
+    path = ANNOTATION_PATH + '/' + FLAGS.split
+    # print(path)
+    for main_dir in os.listdir(path):
+        path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir
+        for sub_dir in os.listdir(path):
+            path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir + '/' + sub_dir
+            print(path)
+            for xml_file in os.listdir(path):
+                if os.path.splitext(xml_file)[1][1:] != 'xml': continue
+                print(os.path.splitext(xml_file)[1][1:])
+                # 어노테이션 파일 경로
+                annotation_xml = path + '/' + xml_file
+                # 어노테이션 파일 읽기
+                annotation_xml = lxml.etree.fromstring(open(annotation_xml).read())
+                # 읽은 어노테이션 파일을 파싱, 'annotation' key에 해당하는 것만 가져옴
+                annotation = parse_xml(annotation_xml)['annotation']
+                # tf.Example 객체 생성
+                tf_example = build_example(annotation, sub_dir[len(ANNOTATION_PATH)+1:], class_map)
+                # TFRecord 파일로 저장
+                writer.write(tf_example.SerializeToString())
+
+
+        
+
+    '''
     for name in tqdm.tqdm(image_list):
         # 어노테이션 파일 경로
         annotation_xml = os.path.join(
@@ -151,6 +186,7 @@ def main(_argv):
         tf_example = build_example(annotation, class_map)
         # TFRecord 파일로 저장
         writer.write(tf_example.SerializeToString())
+    '''
 
     writer.close()
     logging.info("Done")
