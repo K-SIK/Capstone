@@ -8,21 +8,27 @@ import tensorflow as tf
 import lxml.etree
 import tqdm
 
+DATA_PATH = 'C:/Users/wjsdu/OneDrive/Desktop/Capstone_largefiles/DeepLearning/YOLOV3/data'
 # 데이터 경로
-# C:\Users\wjsdu\OneDrive\Desktop\Capstone_largefiles\DeepLearning\YOLOV3\data\images\koreanfood
-flags.DEFINE_string('data_dir', './data/images/koreanfood',
+# [이미지] 훈련: Training/TRAIN_IMAGE_0XX/디렉터리/사진 파일, 검증: Validation/VAL_IMAGE_0XX/디렉터리/사진 파일
+# [어노테이션] 훈련: Training/TRAIN_LABEL/디렉터리/xml 파일, 검증: Validation/VAL_LABEL/디렉터리/xml 파일
+flags.DEFINE_string('data_dir', DATA_PATH + '/images/koreanfood',
                     'path to custom dataset(korean food)')
 # # train/val split
 # VOC 데이터셋에는 train/val을 여러 종류로 나눌 수 있게 하도록 파일명을 묶어서 저장한 txt 파일이 있는데, 그것을 전달
-# flags.DEFINE_enum('split', 'train', [
-#                   'train', 'val'], 'specify train or val split')
+flags.DEFINE_enum('split', 'train', ['train', 'val'],
+                  'specify train or val split')
 
 # 아웃풋 경로.포맷
-flags.DEFINE_string('output_file', './data/koreanfood_train.tfrecord', 'output dataset')
+# koreanfood_train.tfrecord 또는 koreanfood_val.tfrecord 지정
+flags.DEFINE_string('output_file', DATA_PATH + '/koreanfood_train.tfrecord', 
+                    'output dataset')
 # 라벨 파일 경로.포맷
-flags.DEFINE_string('classes', './data/voc2012.names', 'classes file')
+flags.DEFINE_string('classes', DATA_PATH + '/images/koreanfood/koreanfood.names', 
+                    'classes file')
 
 
+# 매 이미지파일마다 호출
 # TFRecord로 저장하기 알맞은 형태로 변환
 # <annotation> 태그와 <object> 태그 안에 어떤 태그들이 있는 지 중요!!!
 def build_example(annotation, class_map):
