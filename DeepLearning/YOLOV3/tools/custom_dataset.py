@@ -23,9 +23,13 @@ flags.DEFINE_enum('split', 'Training', ['Training', 'Validation'],
 # koreanfood_train.tfrecord 또는 koreanfood_val.tfrecord 지정
 flags.DEFINE_string('output_file', DATA_PATH + '/koreanfood_train.tfrecord', 
                     'output dataset')
-# 라벨 파일 경로.포맷
-flags.DEFINE_string('classes', DATA_PATH + '/images/koreanfood/koreanfood.names', 
-                    'classes file')
+
+# 라벨 아이디 파일 경로.포맷
+flags.DEFINE_string('class_ids', DATA_PATH + '/images/koreanfood/koreanfood_ID.names', 
+                    'class id file')
+# 라벨 값 파일 경로.포맷
+flags.DEFINE_string('class_values', DATA_PATH + '/images/koreanfood/koreanfood.names', 
+                    'class value file')
 
 
 # 매 이미지파일마다 호출
@@ -36,7 +40,7 @@ def build_example(annotation, sub_path, class_map):
     ''' 전달받은 annotation 딕셔너리를 이용해 해당 이미지에 대한 정보들을 이용'''
     # 이미지 파일 경로.파일명 ex) FLAGS.data_dir/JPEGImages/2007_000027.jpg
     img_path = DATA_PATH + '/images/koreanfood/Images' + '/' + sub_path + '/' + annotation['filename']
-    print('sub_path: ', sub_path)
+    # print('sub_path: ', sub_path)
     '''
     img_path = os.path.join(
         FLAGS.data_dir, 'JPEGImages', annotation['filename'])
@@ -56,24 +60,25 @@ def build_example(annotation, sub_path, class_map):
     ymax = []
     classes = []
     classes_text = []
-    truncated = []
-    views = []
-    difficult_obj = []
+    #truncated = []
+    #views = []
+    #difficult_obj = []
 
     if 'object' in annotation: # 객체가 있다면, 
         for obj in annotation['object']: # 'object' 키에 해당하는 값인 리스트 안의 객체들에 대해
             # 각 정보들을 뽑아냄
-            difficult = bool(int(obj['difficult']))
-            difficult_obj.append(int(difficult))
+            #difficult = bool(int(obj['difficult']))
+            #difficult_obj.append(int(difficult))
 
             xmin.append(float(obj['bndbox']['xmin']) / width)
             ymin.append(float(obj['bndbox']['ymin']) / height)
             xmax.append(float(obj['bndbox']['xmax']) / width)
             ymax.append(float(obj['bndbox']['ymax']) / height)
             classes_text.append(obj['name'].encode('utf8'))
-            classes.append(class_map[obj['name']])
-            truncated.append(int(obj['truncated']))
-            views.append(obj['pose'].encode('utf8'))
+            if obj['name'] != 'dish':
+                classes.append(class_map[obj['name']])
+            #truncated.append(int(obj['truncated']))
+            #views.append(obj['pose'].encode('utf8'))
 
     # <annotation>의 각 정보를 변환해서 반환
     example = tf.train.Example(features=tf.train.Features(feature={
@@ -92,9 +97,9 @@ def build_example(annotation, sub_path, class_map):
         'image/object/bbox/ymax': tf.train.Feature(float_list=tf.train.FloatList(value=ymax)),
         'image/object/class/text': tf.train.Feature(bytes_list=tf.train.BytesList(value=classes_text)),
         'image/object/class/label': tf.train.Feature(int64_list=tf.train.Int64List(value=classes)),
-        'image/object/difficult': tf.train.Feature(int64_list=tf.train.Int64List(value=difficult_obj)),
-        'image/object/truncated': tf.train.Feature(int64_list=tf.train.Int64List(value=truncated)),
-        'image/object/view': tf.train.Feature(bytes_list=tf.train.BytesList(value=views)),
+        #'image/object/difficult': tf.train.Feature(int64_list=tf.train.Int64List(value=difficult_obj)),
+        #'image/object/truncated': tf.train.Feature(int64_list=tf.train.Int64List(value=truncated)),
+        #'image/object/view': tf.train.Feature(bytes_list=tf.train.BytesList(value=views)),
     }))
     return example
 
@@ -129,12 +134,24 @@ def parse_xml(xml):
 # 어노테이션 파일(xml)을 TFRecord 파일로 변환하여 저장 
 def main(_argv):
     # 라벨 데이터 로드
-    class_map = {name: idx for idx, name in enumerate(
-        open(FLAGS.classes, encoding='UTF8').read().splitlines())}
+    class_map = {id: idx for idx, id in 
+        enumerate(open(FLAGS.class_ids, encoding='UTF8').read().splitlines()
+    )}
+    '''
+    class_map = {id: value for id, value in zip(
+        open(FLAGS.class_ids, encoding='UTF8').read().splitlines(),
+        open(FLAGS.class_values, encoding='UTF8').read().splitlines()
+    )}
+    '''
+    # class_map = {name: idx for idx, name in enumerate(
+    #     open(FLAGS.classes, encoding='UTF8').read().splitlines())}
     logging.info("Class mapping loaded: %s", class_map)
     
     # TFRecord 포맷 writer
-    writer = tf.io.TFRecordWriter(FLAGS.output_file)
+    if FLAGS.split == 'Training':
+        writer = tf.io.TFRecordWriter(DATA_PATH + '/koreanfood_train.tfrecord')
+    else:
+        writer = tf.io.TFRecordWriter(DATA_PATH + '/koreanfood_val.tfrecord')
     '''
     # VOC 데이터셋의 ImageSets/Main/<FLAGS.split>.txt 에 있는 파일명들을 가져옴
     # ImageSets 폴더는 VOC 데이터셋을 train/validation 데이터셋으로 나눌 때 나누기 쉽게 이미지 파일명들을 모아 놓은 txt 파일들이 존재함. 
@@ -152,23 +169,31 @@ def main(_argv):
     ANNOTATION_PATH = DATA_PATH + '/images/koreanfood/Annotations'
     path = ANNOTATION_PATH + '/' + FLAGS.split
     # print(path)
-    for main_dir in os.listdir(path):
+    for main_dir in tqdm.tqdm(os.listdir(path)):
         path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir
         for sub_dir in os.listdir(path):
             path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir + '/' + sub_dir
-            print(path)
+            # print(path)
             for xml_file in os.listdir(path):
                 if os.path.splitext(xml_file)[1][1:] != 'xml': continue
                 # print(os.path.splitext(xml_file)[1][1:])
                 # 어노테이션 파일 경로
                 annotation_xml = path + '/' + xml_file
+                # print(annotation_xml)
                 # 어노테이션 파일 읽기
-                annotation_xml = lxml.etree.fromstring(open(annotation_xml).read())
+                annotation_xml = lxml.etree.fromstring(open(annotation_xml, encoding='UTF8').read())
                 # 읽은 어노테이션 파일을 파싱, 'annotation' key에 해당하는 것만 가져옴
                 annotation = parse_xml(annotation_xml)['annotation']
                 # tf.Example 객체 생성
-                tf_example = build_example(annotation, path[len(ANNOTATION_PATH)+1:], class_map)
+                try:
+                    tf_example = build_example(annotation, path[len(ANNOTATION_PATH)+1:], class_map)
+                except:
+                    logging.info("Error Occurred: {}".format(path+'/'+xml_file))
+                    continue
                 # TFRecord 파일로 저장
+                # if not tf_example: 
+                #     logging.info("No such file: {}".format(path+'/'+xml_file))
+                #     continue
                 writer.write(tf_example.SerializeToString())
 
 
