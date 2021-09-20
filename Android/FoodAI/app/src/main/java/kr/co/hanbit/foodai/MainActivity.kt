@@ -1,12 +1,23 @@
 package kr.co.hanbit.foodai
 
+import android.Manifest
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
+
+    // 권한 관련 상수 선언
+    companion object{
+        const val PERM_STORAGE = 99 // 외부 저장소 권한 요청
+        const val PERM_CAMERA = 100 // 카메라 권한 요청
+        const val REQ_CAMERA = 101  // 카메라 호출
+        const val REQ_STORAGE = 102 // 갤러리 호출
+        const val POPUP_ACTIVITY = 103 // 팝업 액티비티 호출
+    }
 
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
 
@@ -21,8 +32,13 @@ class MainActivity : AppCompatActivity() {
         bnv_main.run { setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.tabPhoto -> {
-                    // TODO: 카메라/갤러리 불러오기
-                    Toast.makeText(this@MainActivity, "'사진 가져오기' 기능 구현 전!", Toast.LENGTH_SHORT).show()
+                    // 카메라 권한 요청
+                    requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
+                    // TODO: 카메라/갤러리 선택
+                    val intent = Intent(this@MainActivity, PopupActivity::class.java)
+                    startActivityForResult(intent, POPUP_ACTIVITY)
+
+
                 }
                 R.id.tabAR -> {
                     // TODO: AR 기능
@@ -45,6 +61,83 @@ class MainActivity : AppCompatActivity() {
             true
         }
             selectedItemId = R.id.tabHome
+        }
+
+        // 외부 저장소(갤러리) 권한 요청
+        requirePermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERM_STORAGE)
+    }
+
+    // 권한 요청 승인 시 호출
+    override fun permissionGranted(requestCode: Int){
+        when(requestCode){
+            // 외부 저장소 권한
+            PERM_STORAGE -> {
+                // setViews() // 카메라 권한 요청
+            }
+            // 카메라 권한
+            PERM_CAMERA -> {
+                // setViews()
+            }
+            // 카메라 호출
+            REQ_CAMERA -> {
+
+            }
+        }
+    }
+    // 권한 요청 거부 시 호출
+    override fun permissionDenied(requestCode: Int) {
+        when(requestCode){
+            // 외부 저장소 권한
+            PERM_STORAGE -> {
+                Toast.makeText(baseContext,
+                                "외부 저장소 권한을 승인해야 앱을 사용할 수 있습니다.",
+                                Toast.LENGTH_LONG).show()
+                finish()
+            }
+            // 카메라 권한
+            PERM_CAMERA -> {
+                Toast.makeText(baseContext,
+                                "카메라 권한을 승인해야 카메라를 사용할 수 있습니다.",
+                                Toast.LENGTH_LONG).show()
+            }
+            // 카메라 호출
+            REQ_CAMERA -> {
+
+            }
+        }
+    }
+
+    fun setViews(){
+        val intent = Intent(this, PopupActivity::class.java)
+        startActivityForResult(intent, POPUP_ACTIVITY)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (resultCode == RESULT_OK){
+            when(requestCode){
+                POPUP_ACTIVITY -> {
+                    val selection = data?.getStringExtra("result")
+                    if(selection == "openCamera"){ // 카메라
+                        // 카메라 호출
+                        Toast.makeText(baseContext, "카메라 선택", Toast.LENGTH_SHORT).show()
+                    }else if(selection == "openGallery") { // 갤러리
+                        // 갤러리 호출
+                        Toast.makeText(baseContext, "갤러리 선택", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                // 카메라, 갤러리 추가
+
+            }
+        }else if(resultCode == RESULT_CANCELED){
+            when (requestCode){
+                POPUP_ACTIVITY -> {
+
+                }
+                // 카메라, 갤러리 추가
+
+            }
         }
     }
 }
