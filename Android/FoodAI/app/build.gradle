@@ -50,7 +50,7 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite:2.4.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
     // LakuePopupActivity 라이브러리
-    implementation 'com.github.lakue119:LakuePopupActivity:1.0.1'
+    // implementation 'com.github.lakue119:LakuePopupActivity:1.0.1'
 
     
     testImplementation 'junit:junit:4.+'

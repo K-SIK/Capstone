@@ -18,7 +18,8 @@
         android:theme="@style/Theme.FoodAI">
         <activity
             android:name=".PopupActivity"
-            android:theme="@android:style/Theme.Dialog"/>
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

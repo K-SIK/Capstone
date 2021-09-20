@@ -6,10 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.lakue.lakuepopupactivity.PopupActivity
-import com.lakue.lakuepopupactivity.PopupGravity
-import com.lakue.lakuepopupactivity.PopupResult
-import com.lakue.lakuepopupactivity.PopupType
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity() {
@@ -39,19 +35,10 @@ class MainActivity : BaseActivity() {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
                     // TODO: 카메라/갤러리 선택
-//                    val intent = Intent(applicationContext, PopupActivity::class.java)
-//                    intent.putExtra("type", PopupType.SELECT)
-//                    intent.putExtra("gravity", PopupGravity.CENTER)
-//                    intent.putExtra("title", "사진 가져오기")
-//                    intent.putExtra("content", "사진을 가져올 경로를 선택해주세요.")
-//                    intent.putExtra("buttonLeft", "카메라")
-//                    intent.putExtra("buttonCenter", "갤러리")
-//                    intent.putExtra("buttonRight", "취소")
-//                    startActivityForResult(intent, POPUP_ACTIVITY)
+                    val intent = Intent(this@MainActivity, PopupActivity::class.java)
+                    startActivityForResult(intent, POPUP_ACTIVITY)
 
 
-//                    val intent = Intent(this@MainActivity, PopupActivity::class.java)
-//                    startActivityForResult(intent, POPUP_ACTIVITY)
                 }
                 R.id.tabAR -> {
                     // TODO: AR 기능
@@ -89,7 +76,7 @@ class MainActivity : BaseActivity() {
             }
             // 카메라 권한
             PERM_CAMERA -> {
-                setViews()
+                // setViews()
             }
             // 카메라 호출
             REQ_CAMERA -> {
@@ -131,27 +118,25 @@ class MainActivity : BaseActivity() {
         if (resultCode == RESULT_OK){
             when(requestCode){
                 POPUP_ACTIVITY -> {
-//                    val selection = data?.getSerializableExtra("result")
-//                    if(selection == PopupResult.LEFT){ // 카메라
-//                        // 카메라 호출
-//                        Toast.makeText(baseContext, "카메라 선택", Toast.LENGTH_SHORT).show()
-//                    }else if(selection == PopupResult.RIGHT){ // 갤러리
-//                        // 갤러리 호출
-//                        Toast.makeText(baseContext, "갤러리 선택", Toast.LENGTH_SHORT).show()
-//
-//                    }else{
-//                        Toast.makeText(baseContext, "종료 1", Toast.LENGTH_SHORT).show()
-//                        finish()
-//                    }
+                    val selection = data?.getStringExtra("result")
+                    if(selection == "openCamera"){ // 카메라
+                        // 카메라 호출
+                        Toast.makeText(baseContext, "카메라 선택", Toast.LENGTH_SHORT).show()
+                    }else if(selection == "openGallery") { // 갤러리
+                        // 갤러리 호출
+                        Toast.makeText(baseContext, "갤러리 선택", Toast.LENGTH_SHORT).show()
+                    }
                 }
+                // 카메라, 갤러리 추가
+
             }
         }else if(resultCode == RESULT_CANCELED){
             when (requestCode){
-                // 카메라, 갤러리 추가
                 POPUP_ACTIVITY -> {
-//                    Toast.makeText(baseContext, "종료 2", Toast.LENGTH_SHORT).show()
-//                    finish()
+
                 }
+                // 카메라, 갤러리 추가
+
             }
         }
     }
