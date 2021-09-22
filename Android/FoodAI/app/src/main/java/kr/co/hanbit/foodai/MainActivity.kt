@@ -45,7 +45,7 @@ class MainActivity : BaseActivity() {
                 R.id.tabPhoto -> {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
-                    // TODO: 카메라/갤러리 선택
+                    // 카메라/갤러리 선택
                     val intent = Intent(this@MainActivity, PopupActivity::class.java)
                     startActivityForResult(intent, POPUP_ACTIVITY)
 
@@ -176,6 +176,13 @@ class MainActivity : BaseActivity() {
         return image
     }
 
+    // 갤러리 열람 메서드
+    fun openGallery(){
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = MediaStore.Images.Media.CONTENT_TYPE
+        startActivityForResult(intent, REQ_STORAGE)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -187,14 +194,21 @@ class MainActivity : BaseActivity() {
                         // 카메라 호출
                         Toast.makeText(baseContext, "카메라 선택", Toast.LENGTH_SHORT).show()
                         openCamera()
-                        // 카메라 이미지 후처리
 
                     }else if(selection == "openGallery") { // 갤러리
                         // 갤러리 호출
                         Toast.makeText(baseContext, "갤러리 선택", Toast.LENGTH_SHORT).show()
+                        openGallery()
                     }
                 }
-                // 카메라, 갤러리 추가
+                REQ_CAMERA -> {
+                    // TODO: 카메라 이미지 후처리
+                    Toast.makeText(baseContext, "사진 촬영 완료!", Toast.LENGTH_SHORT).show()
+                }
+                REQ_STORAGE -> {
+                    // TODO: 갤러리 이미지 후처리
+                    Toast.makeText(baseContext, "사진 선택 완료!", Toast.LENGTH_SHORT).show()
+                }
 
             }
         }else if(resultCode == RESULT_CANCELED){
@@ -202,7 +216,12 @@ class MainActivity : BaseActivity() {
                 POPUP_ACTIVITY -> {
 
                 }
-                // 카메라, 갤러리 추가
+                REQ_CAMERA -> {
+
+                }
+                REQ_STORAGE -> {
+
+                }
 
             }
         }
