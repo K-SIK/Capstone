@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 import java.io.IOException
 import java.text.SimpleDateFormat
+import kr.co.hanbit.foodai.FoodDetector
 
 class MainActivity : BaseActivity() {
 
@@ -29,7 +30,8 @@ class MainActivity : BaseActivity() {
 
     // 전역 프로퍼티
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
-    var realUri: Uri? = null
+    var photoUri: Uri? = null
+    lateinit var foodDetector: FoodDetector
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,8 +143,8 @@ class MainActivity : BaseActivity() {
 
         // 촬영한 이미지를 바로 사용하지 않고 Uri로 생성하여 미디어스토어에 저장하고 사용
         createImageUri(newFileName(), "image/jpg")?.let{uri->
-            realUri = uri
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, realUri)
+            photoUri = uri
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
             startActivityForResult(intent, REQ_CAMERA)
         }
     }
@@ -178,8 +180,9 @@ class MainActivity : BaseActivity() {
 
     // 갤러리 열람 메서드
     fun openGallery(){
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = MediaStore.Images.Media.CONTENT_TYPE
+        val intent = Intent(Intent.ACTION_GET_CONTENT).setType("image/*")
+        // val intent = Intent(Intent.ACTION_PICK)
+        // intent.type = MediaStore.Images.Media.CONTENT_TYPE
         startActivityForResult(intent, REQ_STORAGE)
     }
 
@@ -202,12 +205,23 @@ class MainActivity : BaseActivity() {
                     }
                 }
                 REQ_CAMERA -> {
-                    // TODO: 카메라 이미지 후처리
                     Toast.makeText(baseContext, "사진 촬영 완료!", Toast.LENGTH_SHORT).show()
+                    photoUri?.let{ uri ->
+                        val capturedImage = loadBitmap(uri)
+                        photoUri = null
+                        // 비트맵을 모델에 전달하여 추론 수행
+                        val result = callFoodDetector(capturedImage)
+                    }
+                    // TODO: 모델 반환값 처리 및 출력
                 }
                 REQ_STORAGE -> {
-                    // TODO: 갤러리 이미지 후처리
                     Toast.makeText(baseContext, "사진 선택 완료!", Toast.LENGTH_SHORT).show()
+                    val selectedImageUri: Uri = data?.data as Uri
+                    val selectedImage = loadBitmap(selectedImageUri)
+                    // 비트맵을 모델에 전달하여 추론 수행
+                    val result = callFoodDetector(selectedImage)
+                    // TODO: 모델 반환값 처리 및 출력
+
                 }
 
             }
@@ -224,6 +238,20 @@ class MainActivity : BaseActivity() {
                 }
 
             }
+        }else{
+
         }
+    }
+
+    private fun callFoodDetector(bitmap: Bitmap?): String{
+        foodDetector = FoodDetector(this)
+        // TODO: 모델 반환값 가공 및 반환
+        // val output: Pair<String, Float> = foodDetector.detect(bitmap) ..
+        return ""
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        foodDetector.finish()
     }
 }

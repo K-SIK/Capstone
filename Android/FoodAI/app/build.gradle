@@ -9,6 +9,7 @@ android {
 
     buildFeatures{
         viewBinding true
+        mlModelBinding true
     }
 
     defaultConfig {
@@ -49,6 +50,9 @@ dependencies {
     // 텐서플로 서포트 라이브러리
     implementation 'org.tensorflow:tensorflow-lite:2.4.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc1'
+    // 추론 성능 개선: GPU 위임
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
     // LakuePopupActivity 라이브러리
     // implementation 'com.github.lakue119:LakuePopupActivity:1.0.1'
 
