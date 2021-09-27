@@ -32,6 +32,7 @@ flags.DEFINE_integer('size', 416, 'image size')
 
 
 def main(_argv):
+    # 모델 불러오기
     if FLAGS.tiny:
         yolo = YoloV3Tiny(size=FLAGS.size, classes=FLAGS.num_classes)
     else:
@@ -39,17 +40,25 @@ def main(_argv):
 
     yolo.load_weights(FLAGS.weights)
     logging.info('weights loaded')
+    # ====================================================================================================
 
+    # 모델 변환
     converter = tf.lite.TFLiteConverter.from_keras_model(yolo)
 
-    # Fix from https://stackoverflow.com/questions/64490203/tf-lite-non-max-suppression
+    '''Fix from https://stackoverflow.com/questions/64490203/tf-lite-non-max-suppression'''
+    # tflite OPs selection
     converter.experimental_new_converter = True
     converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS, tf.lite.OpsSet.SELECT_TF_OPS]
+    # Post Training Quantization (Float16 Quantization)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.target_spec.supported_types = [tf.float16]
 
     tflite_model = converter.convert()
     open(FLAGS.output, 'wb').write(tflite_model)
     logging.info("model saved to: {}".format(FLAGS.output))
+    # ====================================================================================================
 
+    # tflite 테스트
     interpreter = tf.lite.Interpreter(model_path=FLAGS.output)
     interpreter.allocate_tensors()
     logging.info('tflite model loaded')

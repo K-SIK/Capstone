@@ -1,12 +1,21 @@
 package kr.co.hanbit.foodai
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
+import java.io.IOException
+import java.text.SimpleDateFormat
+import kr.co.hanbit.foodai.FoodDetector
 
 class MainActivity : BaseActivity() {
 
@@ -19,14 +28,18 @@ class MainActivity : BaseActivity() {
         const val POPUP_ACTIVITY = 103 // 팝업 액티비티 호출
     }
 
+    // 전역 프로퍼티
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
+    var photoUri: Uri? = null
+    lateinit var foodDetector: FoodDetector
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
         // 하단 탭이 눌렸을 때 화면을 전환하기 위해선 이벤트 처리하기 위해 BottomNavigationView 객체 생성
-        var bnv_main = binding.bnvMain
+        val bnv_main = binding.bnvMain
 
         // OnNavigationItemSelectedListener를 통해 탭 아이템 선택 시 이벤트를 처리
         bnv_main.run { setOnNavigationItemSelectedListener {
@@ -34,7 +47,7 @@ class MainActivity : BaseActivity() {
                 R.id.tabPhoto -> {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
-                    // TODO: 카메라/갤러리 선택
+                    // 카메라/갤러리 선택
                     val intent = Intent(this@MainActivity, PopupActivity::class.java)
                     startActivityForResult(intent, POPUP_ACTIVITY)
 
@@ -72,11 +85,11 @@ class MainActivity : BaseActivity() {
         when(requestCode){
             // 외부 저장소 권한
             PERM_STORAGE -> {
-                // setViews() // 카메라 권한 요청
+
             }
             // 카메라 권한
             PERM_CAMERA -> {
-                // setViews()
+
             }
             // 카메라 호출
             REQ_CAMERA -> {
@@ -107,9 +120,70 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    fun setViews(){
-        val intent = Intent(this, PopupActivity::class.java)
-        startActivityForResult(intent, POPUP_ACTIVITY)
+//    fun setViews(){
+//        val intent = Intent(this, PopupActivity::class.java)
+//        startActivityForResult(intent, POPUP_ACTIVITY)
+//    }
+
+    // 촬영한 이미지를 저장할 Uri를 미디어스토어에 생성하는 메서드
+    fun createImageUri(filename: String, mimeType: String): Uri?{
+        // ContentValues 클래스를 사용해 파일명과 파일의 타입을 입력한 후,
+        // ContentResolver의 insert() 메서드를 통해 저장
+        var values = ContentValues()
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+        values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+        // 파라미터: 저장소명, 저장할 콘텐트
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    }
+
+    // 실질적인 카메라 호출 메서드
+    fun openCamera(){
+        // 카메라 호출 시 보낼 인텐트
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+
+        // 촬영한 이미지를 바로 사용하지 않고 Uri로 생성하여 미디어스토어에 저장하고 사용
+        createImageUri(newFileName(), "image/jpg")?.let{uri->
+            photoUri = uri
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            startActivityForResult(intent, REQ_CAMERA)
+        }
+    }
+
+    // 새로운 파일명을 만들어주는 메서드 (파일명이 중복되지 않도록 현재 시각 사용)
+    fun newFileName(): String{
+        // SimpleDateFormat(java.text) 사용
+        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss")
+        val filename = sdf.format(System.currentTimeMillis())
+        // 연월일_시간.jpg
+        return "$filename.jpg"
+    }
+
+    // Uri를 이용해서 미디어스토어에 저장된 이미지를 읽어오는 메서드
+    // 파라미터로 Uri를 받아 결괏괎을 Bitmap으로 반환
+    fun loadBitmap(photoUri: Uri): Bitmap?{
+        var image: Bitmap? = null
+        // API 버전이 27 이하이면 MediaStore에 있는 getBitmap 메서드를 사용하고, 27보다 크면 ImageDecoder 사용
+        try{
+            image = if (Build.VERSION.SDK_INT > 27){
+                val source: ImageDecoder.Source =
+                        ImageDecoder.createSource(this.contentResolver, photoUri)
+                ImageDecoder.decodeBitmap(source)
+            }else{
+                MediaStore.Images.Media.getBitmap(this.contentResolver, photoUri)
+            }
+        }catch(e: IOException){
+            e.printStackTrace()
+        }
+
+        return image
+    }
+
+    // 갤러리 열람 메서드
+    fun openGallery(){
+        val intent = Intent(Intent.ACTION_GET_CONTENT).setType("image/*")
+        // val intent = Intent(Intent.ACTION_PICK)
+        // intent.type = MediaStore.Images.Media.CONTENT_TYPE
+        startActivityForResult(intent, REQ_STORAGE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -122,12 +196,33 @@ class MainActivity : BaseActivity() {
                     if(selection == "openCamera"){ // 카메라
                         // 카메라 호출
                         Toast.makeText(baseContext, "카메라 선택", Toast.LENGTH_SHORT).show()
+                        openCamera()
+
                     }else if(selection == "openGallery") { // 갤러리
                         // 갤러리 호출
                         Toast.makeText(baseContext, "갤러리 선택", Toast.LENGTH_SHORT).show()
+                        openGallery()
                     }
                 }
-                // 카메라, 갤러리 추가
+                REQ_CAMERA -> {
+                    Toast.makeText(baseContext, "사진 촬영 완료!", Toast.LENGTH_SHORT).show()
+                    photoUri?.let{ uri ->
+                        val capturedImage = loadBitmap(uri)
+                        photoUri = null
+                        // 비트맵을 모델에 전달하여 추론 수행
+                        val result = callFoodDetector(capturedImage)
+                    }
+                    // TODO: 모델 반환값 처리 및 출력
+                }
+                REQ_STORAGE -> {
+                    Toast.makeText(baseContext, "사진 선택 완료!", Toast.LENGTH_SHORT).show()
+                    val selectedImageUri: Uri = data?.data as Uri
+                    val selectedImage = loadBitmap(selectedImageUri)
+                    // 비트맵을 모델에 전달하여 추론 수행
+                    val result = callFoodDetector(selectedImage)
+                    // TODO: 모델 반환값 처리 및 출력
+
+                }
 
             }
         }else if(resultCode == RESULT_CANCELED){
@@ -135,9 +230,28 @@ class MainActivity : BaseActivity() {
                 POPUP_ACTIVITY -> {
 
                 }
-                // 카메라, 갤러리 추가
+                REQ_CAMERA -> {
+
+                }
+                REQ_STORAGE -> {
+
+                }
 
             }
+        }else{
+
         }
+    }
+
+    private fun callFoodDetector(bitmap: Bitmap?): String{
+        foodDetector = FoodDetector(this)
+        // TODO: 모델 반환값 가공 및 반환
+        // val output: Pair<String, Float> = foodDetector.detect(bitmap) ..
+        return ""
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        foodDetector.finish()
     }
 }
