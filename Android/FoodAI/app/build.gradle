@@ -18,6 +18,10 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+//        // abiFilters: filter out unnecessary x86 ABIs in tensorflow ops dependency
+//        ndk{
+//            abiFilters 'armeabi-v7a', 'arm64-v8a'
+//        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,6 +57,9 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0-rc1'
     // 추론 성능 개선: GPU 위임
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.4.0'
+    // TF op support.
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
+    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly-SNAPSHOT'
     // LakuePopupActivity 라이브러리
     // implementation 'com.github.lakue119:LakuePopupActivity:1.0.1'
 
