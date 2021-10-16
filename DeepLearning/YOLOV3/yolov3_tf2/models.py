@@ -225,7 +225,8 @@ def yolo_nms(outputs, anchors, masks, classes):
     classes = tf.expand_dims(classes, axis=0)
     valid_detections=num_valid_nms_boxes
     valid_detections = tf.expand_dims(valid_detections, axis=0)
-
+    
+    # 박스 좌표, 각 클래스 확률, 클래스, 탐지 수
     return boxes, scores, classes, valid_detections
 
 

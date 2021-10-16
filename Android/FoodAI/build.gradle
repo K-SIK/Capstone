@@ -21,6 +21,10 @@ allprojects {
         jcenter() // Warning: this repository is going to shut down soon
         // 팝업 액티비티
         maven {url 'https://jitpack.io'}
+        maven {
+            name 'ossrh-snapshot'
+            url 'http://oss.sonatype.org/content/repositories/snapshots'
+        }
     }
 }
 

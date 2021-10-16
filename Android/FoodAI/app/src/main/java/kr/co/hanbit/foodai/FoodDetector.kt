@@ -3,7 +3,9 @@ package kr.co.hanbit.foodai
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
+import android.util.Log
 import androidx.annotation.NonNull
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
@@ -49,6 +51,10 @@ class FoodDetector(context: Context) {
     var modelInputHeight: Int = 0
     // 4-1. 추론: 모델의 추론된 출력 값을 저장할 프로퍼티 선언
     lateinit var outputBuffer: TensorBuffer
+    lateinit var outputBufferBoxes: TensorBuffer
+    lateinit var outputBufferScores: TensorBuffer
+    lateinit var outputBufferClasses: TensorBuffer
+    lateinit var outputBufferNums: TensorBuffer
     // 5-3. 추론 결과 해석: 라벨 목록을 저장하는 프로퍼티 선언
     private lateinit var labels: List<String>
 
@@ -60,10 +66,10 @@ class FoodDetector(context: Context) {
         // model?.order(ByteOrder.nativeOrder())?:throw IOException()
         // interpreter = Interpreter(model)
         // Model 클래스가 tflite 파일 로드부터 추론까지 모두 수행
-        model = Model.createModel(context, MODEL_NAME)
-        // 모델 성능 개선
+        // model = Model.createModel(context, MODEL_NAME)
+        /* 모델 성능 개선 */
         // model = createMultiThreadModel(2) // CPU 멀티스레드 모델
-        // model = createGPUModel()          // GPU 위임 모델
+        model = createGPUModel()          // GPU 위임 모델
         // model = createNNAPIModel()        // NNAPI 위임 모델
         // ========================================================================================
 
@@ -89,11 +95,20 @@ class FoodDetector(context: Context) {
 
         // 4-2. 추론: 모델의 출력값을 저장할 TensorBuffer 생성
         // ========================================================================================
+        // 모델 출력값 참조
         // val outputTensor = interpreter.getOutputTensor(0)
-        val outputTensor = model.getOutputTensor(0)
+        // val outputTensor = model.getOutputTensor(0)
+        val outputTensorBoxes = model.getOutputTensor(0)
+        val outputTensorScores = model.getOutputTensor(1)
+        val outputTensorClasses = model.getOutputTensor(2)
+        val outputTensorNums = model.getOutputTensor(3)
         // ========================================================================================
-        outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
-
+        // 모델의 반환값을 저장할 텐서 버퍼 생성 (텐서버퍼는 현재 FLOAT32와 UINT8 자료형만 지원)
+        // outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
+        outputBufferBoxes = TensorBuffer.createFixedSize(outputTensorBoxes.shape(), outputTensorBoxes.dataType())
+        outputBufferScores = TensorBuffer.createFixedSize(outputTensorScores.shape(), outputTensorScores.dataType())
+        outputBufferClasses = TensorBuffer.createFixedSize(outputTensorClasses.shape(), DataType.UINT8)
+        outputBufferNums = TensorBuffer.createFixedSize(outputTensorNums.shape(), DataType.UINT8)
     }
 
     // TODO: 입력 이미지 전처리
@@ -130,18 +145,31 @@ class FoodDetector(context: Context) {
     // 4-3. 추론: 추론 메서드 정의
     fun detect(image: Bitmap?): Pair<String, Float>{
         // 전처리된 입력 이미지 load
+        // image: Bitmap / inputImage: TensorImage
         inputImage = loadImage(image)
+        Log.d("FoodDetector", "Image loading successed")
         // ========================================================================================
         // interpreter.run(inputImage.buffer, outputBuffer.buffer.rewind())
         // Model 클래스의 파라미터는 각각 Object의 배열과 Object의 Map을 요구
-        val inputs = arrayOf<Object>(inputImage.buffer as Object)
+        val inputs = arrayOf<Any>(inputImage.buffer as Any)
+        Log.d("FoodDetector", "Input buffer created")
         // TODO: 객체 탐지 모델 추론과 반환값
-        val outputs = mutableMapOf<Int, Object>()
-        outputs.put(0, outputBuffer.buffer.rewind() as Object)
-        model.run(inputs, outputs as @NonNull Map<Int, Any>)
+        // val outputs = mutableMapOf<Int, Any>()
+        val outputs = mutableListOf<TensorBuffer>()
+        // outputs.put(0, outputBuffer.buffer.rewind() as Any)
+        Log.d("FoodDetector", "Output buffer created")
+        // model.run(inputs, outputs as @NonNull Map<Int, Any>)
+        val interpreter = Interpreter()
+        Log.d("FoodDetector", "Model run successed")
+        // 반환값 저장
+        outputBufferBoxes = outputs[0]
+        outputBufferScores = outputs[1]
+        outputBufferClasses = outputs[2]
+        outputBufferNums = outputs[3]
         // ========================================================================================
 
-        // 5-5. 추론 결과 해석: 모델 출력값을 라벨에 매핑하여 반환
+
+        // 5-5. 추론 결과 해석: 모델이 반환한 인덱스를 라벨에 매핑하여 반환
         val output = TensorLabel(labels, outputBuffer).getMapWithFloatValue() // Map<String, Float>
 
         return argmax(output)

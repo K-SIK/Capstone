@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
@@ -246,12 +247,16 @@ class MainActivity : BaseActivity() {
     private fun callFoodDetector(bitmap: Bitmap?): String{
         foodDetector = FoodDetector(this)
         // TODO: 모델 반환값 가공 및 반환
+        Log.d("MainActivity", "called FoodDetector")
+        foodDetector.detect(bitmap)
         // val output: Pair<String, Float> = foodDetector.detect(bitmap) ..
         return ""
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        foodDetector.finish()
+        // lateinit 검사
+        if(::foodDetector.isInitialized)
+            foodDetector.finish()
     }
 }

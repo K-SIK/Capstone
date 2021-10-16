@@ -4,7 +4,7 @@
     <item android:id="@+id/tabPhoto" app:showAsAction="ifRoom"
         android:icon="@drawable/camera" android:title="사진 가져오기" />
     <item android:id="@+id/tabAR" app:showAsAction="ifRoom"
-        android:icon="@drawable/AR" android:title="AR" />
+        android:icon="@drawable/ar" android:title="AR" />
     <item android:id="@+id/tabHome" app:showAsAction="ifRoom" android:enabled="true"
         android:icon="@drawable/home" android:title="홈" />
     <item android:id="@+id/tabList" app:showAsAction="ifRoom"
