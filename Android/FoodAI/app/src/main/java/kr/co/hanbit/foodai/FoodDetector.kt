@@ -38,9 +38,9 @@ class FoodDetector(context: Context) {
 
     // ===========================================================================================
     // 2-4. 모델 로드: interpreter 프로퍼티 선언
-    // lateinit var interpreter: Interpreter
+    lateinit var model: Interpreter
     // Model 클래스 사용 시 Interpreter를 직접 생성할 필요가 없음
-    var model: Model
+    // var model: Model
     // ============================================================================================
 
     // 3-1. 입력 이미지 전처리: 모델의 입력 이미지를 저장할 프로퍼티 선언
@@ -61,15 +61,15 @@ class FoodDetector(context: Context) {
 
     init{
         // ========================================================================================
-        // 2-3. 모델 로드: tflite 파일 로드
-        // val model: ByteBuffer? = FileUtil.loadMappedFile(context, MODEL_NAME)
-        // model?.order(ByteOrder.nativeOrder())?:throw IOException()
-        // interpreter = Interpreter(model)
+        // 2-3. 모델 로드: tflite 파일 로드 (Interpreter)
+        val modelFile: ByteBuffer? = FileUtil.loadMappedFile(context, MODEL_NAME)
+        modelFile?.order(ByteOrder.nativeOrder())?:throw IOException()
+        model = Interpreter(modelFile)
         // Model 클래스가 tflite 파일 로드부터 추론까지 모두 수행
         // model = Model.createModel(context, MODEL_NAME)
         /* 모델 성능 개선 */
         // model = createMultiThreadModel(2) // CPU 멀티스레드 모델
-        model = createGPUModel()          // GPU 위임 모델
+        // model = createGPUModel()          // GPU 위임 모델
         // model = createNNAPIModel()        // NNAPI 위임 모델
         // ========================================================================================
 
@@ -107,8 +107,8 @@ class FoodDetector(context: Context) {
         // outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
         outputBufferBoxes = TensorBuffer.createFixedSize(outputTensorBoxes.shape(), outputTensorBoxes.dataType())
         outputBufferScores = TensorBuffer.createFixedSize(outputTensorScores.shape(), outputTensorScores.dataType())
-        outputBufferClasses = TensorBuffer.createFixedSize(outputTensorClasses.shape(), DataType.UINT8)
-        outputBufferNums = TensorBuffer.createFixedSize(outputTensorNums.shape(), DataType.UINT8)
+        outputBufferClasses = TensorBuffer.createFixedSize(outputTensorClasses.shape(), DataType.FLOAT32)
+        outputBufferNums = TensorBuffer.createFixedSize(outputTensorNums.shape(), DataType.FLOAT32)
     }
 
     // TODO: 입력 이미지 전처리
@@ -154,18 +154,25 @@ class FoodDetector(context: Context) {
         val inputs = arrayOf<Any>(inputImage.buffer as Any)
         Log.d("FoodDetector", "Input buffer created")
         // TODO: 객체 탐지 모델 추론과 반환값
-        // val outputs = mutableMapOf<Int, Any>()
-        val outputs = mutableListOf<TensorBuffer>()
+        // 반환값을 담을 버퍼와 자리 생성
+        val outputs = mutableMapOf<Int, Any>()
+        outputs.put(0, outputBufferBoxes.buffer.rewind() as Any)
+        outputs.put(1, outputBufferScores.buffer.rewind() as Any)
+        outputs.put(2, outputBufferClasses.buffer.rewind() as Any)
+        outputs.put(3, outputBufferNums.buffer.rewind() as Any)
+
+        // val outputs = mutableListOf<TensorBuffer>()
         // outputs.put(0, outputBuffer.buffer.rewind() as Any)
         Log.d("FoodDetector", "Output buffer created")
+        /* ==========10/16 수정 - 다중 반환값을 받기 위해 Model 클래스 대신 Interpreter 클래스 사용 ====== */
+        model.runForMultipleInputsOutputs(inputs, outputs)
         // model.run(inputs, outputs as @NonNull Map<Int, Any>)
-        val interpreter = Interpreter()
         Log.d("FoodDetector", "Model run successed")
         // 반환값 저장
-        outputBufferBoxes = outputs[0]
-        outputBufferScores = outputs[1]
-        outputBufferClasses = outputs[2]
-        outputBufferNums = outputs[3]
+//        outputBufferBoxes = outputs[0] as TensorBuffer
+//        outputBufferScores = outputs[1] as TensorBuffer
+//        outputBufferClasses = outputs[2] as TensorBuffer
+//        outputBufferNums = outputs[3] as TensorBuffer
         // ========================================================================================
 
 
