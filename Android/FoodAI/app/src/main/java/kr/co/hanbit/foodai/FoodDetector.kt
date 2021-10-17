@@ -28,7 +28,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3.tflite"
+        private const val MODEL_NAME = "yolov3-tiny.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -105,10 +105,14 @@ class FoodDetector(context: Context) {
         // ========================================================================================
         // 모델의 반환값을 저장할 텐서 버퍼 생성 (텐서버퍼는 현재 FLOAT32와 UINT8 자료형만 지원)
         // outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
-        outputBufferBoxes = TensorBuffer.createFixedSize(outputTensorBoxes.shape(), outputTensorBoxes.dataType())
-        outputBufferScores = TensorBuffer.createFixedSize(outputTensorScores.shape(), outputTensorScores.dataType())
-        outputBufferClasses = TensorBuffer.createFixedSize(outputTensorClasses.shape(), DataType.FLOAT32)
-        outputBufferNums = TensorBuffer.createFixedSize(outputTensorNums.shape(), DataType.FLOAT32)
+        Log.i("FoodDetector", "${outputTensorBoxes.shape()}, ${outputTensorBoxes.dataType()}")
+        Log.i("FoodDetector", "${outputTensorScores.shape()}, ${outputTensorScores.dataType()}")
+        Log.i("FoodDetector", "${outputTensorClasses.shape()}, ${outputTensorClasses.dataType()}")
+        Log.i("FoodDetector", "${outputTensorNums.shape()}, ${outputTensorNums.dataType()}")
+        outputBufferBoxes = TensorBuffer.createFixedSize(intArrayOf(1,100,4), outputTensorBoxes.dataType())
+        outputBufferScores = TensorBuffer.createFixedSize(intArrayOf(1,100), outputTensorScores.dataType())
+        outputBufferClasses = TensorBuffer.createFixedSize(intArrayOf(1,100), DataType.UINT8)
+        outputBufferNums = TensorBuffer.createFixedSize(intArrayOf(1), DataType.UINT8)
     }
 
     // TODO: 입력 이미지 전처리
