@@ -28,7 +28,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3-tiny.tflite"
+        private const val MODEL_NAME = "yolov3_dynamic_range.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -109,10 +109,10 @@ class FoodDetector(context: Context) {
         Log.i("FoodDetector", "${outputTensorScores.shape()}, ${outputTensorScores.dataType()}")
         Log.i("FoodDetector", "${outputTensorClasses.shape()}, ${outputTensorClasses.dataType()}")
         Log.i("FoodDetector", "${outputTensorNums.shape()}, ${outputTensorNums.dataType()}")
-        outputBufferBoxes = TensorBuffer.createFixedSize(intArrayOf(1,100,4), outputTensorBoxes.dataType())
-        outputBufferScores = TensorBuffer.createFixedSize(intArrayOf(1,100), outputTensorScores.dataType())
-        outputBufferClasses = TensorBuffer.createFixedSize(intArrayOf(1,100), DataType.UINT8)
-        outputBufferNums = TensorBuffer.createFixedSize(intArrayOf(1), DataType.UINT8)
+        outputBufferBoxes = TensorBuffer.createFixedSize(intArrayOf(1,100,4), DataType.FLOAT32)
+        outputBufferScores = TensorBuffer.createFixedSize(intArrayOf(1,100), DataType.FLOAT32)
+        outputBufferClasses = TensorBuffer.createFixedSize(intArrayOf(1,100,2), DataType.FLOAT32)
+        outputBufferNums = TensorBuffer.createFixedSize(intArrayOf(1), DataType.FLOAT32)
     }
 
     // TODO: 입력 이미지 전처리
@@ -157,7 +157,7 @@ class FoodDetector(context: Context) {
         // Model 클래스의 파라미터는 각각 Object의 배열과 Object의 Map을 요구
         val inputs = arrayOf<Any>(inputImage.buffer as Any)
         Log.d("FoodDetector", "Input buffer created")
-        // TODO: 객체 탐지 모델 추론과 반환값
+        // TODO: 객체 탐지 모델 추론과 반환값 (10/17)
         // 반환값을 담을 버퍼와 자리 생성
         val outputs = mutableMapOf<Int, Any>()
         outputs.put(0, outputBufferBoxes.buffer.rewind() as Any)
@@ -172,14 +172,13 @@ class FoodDetector(context: Context) {
         model.runForMultipleInputsOutputs(inputs, outputs)
         // model.run(inputs, outputs as @NonNull Map<Int, Any>)
         Log.d("FoodDetector", "Model run successed")
-        // 반환값 저장
-//        outputBufferBoxes = outputs[0] as TensorBuffer
-//        outputBufferScores = outputs[1] as TensorBuffer
-//        outputBufferClasses = outputs[2] as TensorBuffer
-//        outputBufferNums = outputs[3] as TensorBuffer
+        Log.i("Model return value", "${outputBufferBoxes.floatArray[0]}")
+        Log.i("Model return value", "${outputBufferScores.floatArray[0]}")
+        Log.i("Model return value", "${outputBufferClasses.floatArray[0]}")
+        Log.i("Model return value", "${outputBufferNums.floatArray[0]}")
         // ========================================================================================
 
-
+        // TODO: 반환값 전처리 (10/18 - )
         // 5-5. 추론 결과 해석: 모델이 반환한 인덱스를 라벨에 매핑하여 반환
         val output = TensorLabel(labels, outputBuffer).getMapWithFloatValue() // Map<String, Float>
 
