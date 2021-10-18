@@ -49,15 +49,16 @@ def main(_argv):
     # tflite OPs selection
     converter.experimental_new_converter = True
     converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS, tf.lite.OpsSet.SELECT_TF_OPS]
-    # Post Training Quantization (Float16 Quantization)
+    # Post Training Quantization (Dynamic Range Quantization)
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    converter.target_spec.supported_types = [tf.float16]
+    # Post Training Quantization (Float16 Quantization)
+    # converter.target_spec.supported_types = [tf.float16]
 
     tflite_model = converter.convert()
     open(FLAGS.output, 'wb').write(tflite_model)
     logging.info("model saved to: {}".format(FLAGS.output))
     # ====================================================================================================
-
+    '''
     # tflite 테스트
     interpreter = tf.lite.Interpreter(model_path=FLAGS.output)
     interpreter.allocate_tensors()
@@ -81,6 +82,7 @@ def main(_argv):
     output_data = interpreter.get_tensor(output_details[0]['index'])
 
     print(output_data)
+    '''
 
 if __name__ == '__main__':
     app.run(main)

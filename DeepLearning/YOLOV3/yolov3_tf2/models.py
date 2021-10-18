@@ -227,6 +227,7 @@ def yolo_nms(outputs, anchors, masks, classes):
     valid_detections = tf.expand_dims(valid_detections, axis=0)
     
     # 박스 좌표, 각 클래스 확률, 클래스, 탐지 수
+    print(boxes.shape, scores.shape, classes.shape, valid_detections.shape)
     return boxes, scores, classes, valid_detections
 
 
@@ -344,3 +345,4 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
 
         return xy_loss + wh_loss + obj_loss + class_loss
     return yolo_loss
+
