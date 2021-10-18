@@ -48,10 +48,6 @@ class MainActivity : BaseActivity() {
                 R.id.tabPhoto -> {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
-                    // 카메라/갤러리 선택
-                    val intent = Intent(this@MainActivity, PopupActivity::class.java)
-                    startActivityForResult(intent, POPUP_ACTIVITY)
-
 
                 }
                 R.id.tabAR -> {
@@ -90,7 +86,9 @@ class MainActivity : BaseActivity() {
             }
             // 카메라 권한
             PERM_CAMERA -> {
-
+                // 카메라/갤러리 선택
+                val intent = Intent(this@MainActivity, PopupActivity::class.java)
+                startActivityForResult(intent, POPUP_ACTIVITY)
             }
             // 카메라 호출
             REQ_CAMERA -> {
@@ -113,6 +111,7 @@ class MainActivity : BaseActivity() {
                 Toast.makeText(baseContext,
                                 "카메라 권한을 승인해야 카메라를 사용할 수 있습니다.",
                                 Toast.LENGTH_LONG).show()
+
             }
             // 카메라 호출
             REQ_CAMERA -> {
@@ -214,6 +213,8 @@ class MainActivity : BaseActivity() {
                         val result = callFoodDetector(capturedImage)
                     }
                     // TODO: 모델 반환값 처리 및 출력
+
+
                 }
                 REQ_STORAGE -> {
                     Toast.makeText(baseContext, "사진 선택 완료!", Toast.LENGTH_SHORT).show()
@@ -222,6 +223,7 @@ class MainActivity : BaseActivity() {
                     // 비트맵을 모델에 전달하여 추론 수행
                     val result = callFoodDetector(selectedImage)
                     // TODO: 모델 반환값 처리 및 출력
+
 
                 }
 
