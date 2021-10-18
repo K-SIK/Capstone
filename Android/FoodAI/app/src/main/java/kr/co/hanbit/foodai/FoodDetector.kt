@@ -186,7 +186,7 @@ class FoodDetector(context: Context) {
 
     }
 
-    // TODO: 상위 5개의 후보 반환
+    // TODO: 반환값 전처리
     // 5-6. 추론 결과 해석: Map에서 확률이 가장 높은 클래스명과 확률 쌍을 찾아서 반환하는 메서드 정의
     private fun argmax(map: Map<String, Float>): Pair<String, Float>{
         var maxKey = ""
