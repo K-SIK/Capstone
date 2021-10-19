@@ -58,11 +58,13 @@ def main(_argv):
     img = transform_images(img, FLAGS.size)
 
     t1 = time.time()
+    # Model detection and return output
     boxes, scores, classes, nums = yolo(img)
     t2 = time.time()
     logging.info('time: {}'.format(t2 - t1))
 
     logging.info('detections:')
+    # preprocess returned value
     for i in range(nums[0]):
         logging.info('\t{}, {}, {}'.format(class_names[int(classes[0][i])],
                                            np.array(scores[0][i]),

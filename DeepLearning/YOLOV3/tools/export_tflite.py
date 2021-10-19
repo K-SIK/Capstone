@@ -30,10 +30,11 @@ flags.DEFINE_integer('num_classes', 80, 'number of classes in the model')
 # 이미지 크기
 flags.DEFINE_integer('size', 416, 'image size')
 # 양자화
-flags.DEFINE_string('quantization', 'no', ['no', 'dynamic_range', 'float16'], 
+flags.DEFINE_enum('quantization', 'no', ['no', 'dynamic_range', 'float16'], 
                     'no: no quantization, '
                     'dynamic_range: dynamic range quantization (1/4 size), '
                     'float16: float16 quantization (1/2 size)')
+                    
 
 
 def main(_argv):
