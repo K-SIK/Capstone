@@ -178,7 +178,7 @@ class FoodDetector(context: Context) {
         Log.i("Model return value", "${outputBufferBoxes.floatArray[0]}")
         Log.i("Model return value", "${outputBufferScores.floatArray[0]}")
         Log.i("Model return value", "${outputBufferClasses.floatArray[0]}")
-        Log.i("Model return value", "${outputBufferNums.intArray[0]}")
+        Log.i("Model return value", "${outputBufferNums.intArray[0]}") 
 
         // ========================================================================================
 
