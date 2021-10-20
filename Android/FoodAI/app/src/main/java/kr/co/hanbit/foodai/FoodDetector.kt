@@ -28,7 +28,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3_dynamic_range.tflite"
+        private const val MODEL_NAME = "yolov3-tiny.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -111,7 +111,7 @@ class FoodDetector(context: Context) {
         Log.i("FoodDetector", "${outputTensorNums.shape()}, ${outputTensorNums.dataType()}")
         outputBufferBoxes = TensorBuffer.createFixedSize(intArrayOf(1,100,4), DataType.FLOAT32)
         outputBufferScores = TensorBuffer.createFixedSize(intArrayOf(1,100), DataType.FLOAT32)
-        outputBufferClasses = TensorBuffer.createFixedSize(intArrayOf(1,100,2), DataType.FLOAT32)
+        outputBufferClasses = TensorBuffer.createFixedSize(intArrayOf(1,100), DataType.FLOAT32)
         outputBufferNums = TensorBuffer.createFixedSize(intArrayOf(1), DataType.FLOAT32)
     }
 
@@ -133,7 +133,7 @@ class FoodDetector(context: Context) {
         val imageProcessor =
             ImageProcessor.Builder()                            // Builder 생성
                 .add(ResizeOp(modelInputWidth,modelInputHeight, // 이미지 크기 변환
-                    ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+                    ResizeOp.ResizeMethod.BILINEAR))            // 이미지 보간
                 .add(NormalizeOp(0.0f, 255.0f))    // 이미지 정규화
                 .build()                                       // ImageProcessor 생성
         // 이미지를 전처리하여 TensorImage 형태로 반환
@@ -172,10 +172,16 @@ class FoodDetector(context: Context) {
         model.runForMultipleInputsOutputs(inputs, outputs)
         // model.run(inputs, outputs as @NonNull Map<Int, Any>)
         Log.d("FoodDetector", "Model run successed")
+        // 반환값: 탐지 박스, 확률, 클래스, 탐지 개수
+        // 탐지 박스의 경우 0~3, 4~7 과 같은 식으로 하나의 객체에 대한 4개(xmin, ymin, xmax, ymax) 값이 존재
         Log.i("Model return value", "${outputBufferBoxes.floatArray[0]}")
         Log.i("Model return value", "${outputBufferScores.floatArray[0]}")
         Log.i("Model return value", "${outputBufferClasses.floatArray[0]}")
-        Log.i("Model return value", "${outputBufferNums.floatArray[0]}")
+        Log.i("Model return value", "${outputBufferNums.intArray[0]}")
+        for (num in outputBufferNums.intArray){
+            Log.i("For", "$num")
+        }
+
         // ========================================================================================
 
         // TODO: 반환값 전처리 (10/18 - )

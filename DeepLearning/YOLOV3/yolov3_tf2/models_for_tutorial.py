@@ -25,6 +25,11 @@ yolo_anchors = np.array([(10, 13), (16, 30), (33, 23), (30, 61), (62, 45),
                         np.float32) / 416
 yolo_anchor_masks = np.array([[6, 7, 8], [3, 4, 5], [0, 1, 2]])
 
+yolo_tiny_anchors = np.array([(10, 14), (23, 27), (37, 58),
+                              (81, 82), (135, 169),  (344, 319)],
+                             np.float32) / 416
+yolo_tiny_anchor_masks = np.array([[3, 4, 5], [0, 1, 2]])
+
 
 def DarknetConv(x, filters, size, strides=1, batch_norm=True):
     if strides == 1:
@@ -67,6 +72,24 @@ def Darknet(name=None):
     return tf.keras.Model(inputs, (x_36, x_61, x), name=name)
 
 
+def DarknetTiny(name=None):
+    x = inputs = Input([None, None, 3])
+    x = DarknetConv(x, 16, 3)
+    x = MaxPool2D(2, 2, 'same')(x)
+    x = DarknetConv(x, 32, 3)
+    x = MaxPool2D(2, 2, 'same')(x)
+    x = DarknetConv(x, 64, 3)
+    x = MaxPool2D(2, 2, 'same')(x)
+    x = DarknetConv(x, 128, 3)
+    x = MaxPool2D(2, 2, 'same')(x)
+    x = x_8 = DarknetConv(x, 256, 3)  # skip connection
+    x = MaxPool2D(2, 2, 'same')(x)
+    x = DarknetConv(x, 512, 3)
+    x = MaxPool2D(2, 1, 'same')(x)
+    x = DarknetConv(x, 1024, 3)
+    return tf.keras.Model(inputs, (x_8, x), name=name)
+
+
 def YoloConv(filters, name=None):
     def yolo_conv(x_in):
         if isinstance(x_in, tuple):
@@ -89,6 +112,24 @@ def YoloConv(filters, name=None):
     return yolo_conv
 
 
+def YoloConvTiny(filters, name=None):
+    def yolo_conv(x_in):
+        if isinstance(x_in, tuple):
+            inputs = Input(x_in[0].shape[1:]), Input(x_in[1].shape[1:])
+            x, x_skip = inputs
+
+            # concat with skip connection
+            x = DarknetConv(x, filters, 1)
+            x = UpSampling2D(2)(x)
+            x = Concatenate()([x, x_skip])
+        else:
+            x = inputs = Input(x_in.shape[1:])
+            x = DarknetConv(x, filters, 1)
+
+        return Model(inputs, x, name=name)(x_in)
+    return yolo_conv
+
+
 def YoloOutput(filters, anchors, classes, name=None):
     def yolo_output(x_in):
         x = inputs = Input(x_in.shape[1:])
@@ -98,6 +139,16 @@ def YoloOutput(filters, anchors, classes, name=None):
                                             anchors, classes + 5)))(x)
         return tf.keras.Model(inputs, x, name=name)(x_in)
     return yolo_output
+
+
+# As tensorflow lite doesn't support tf.size used in tf.meshgrid, 
+# we reimplemented a simple meshgrid function that use basic tf function.
+def _meshgrid(n_a, n_b):
+
+    return [
+        tf.reshape(tf.tile(tf.range(n_a), [n_b]), (n_b, n_a)),
+        tf.reshape(tf.repeat(tf.range(n_b), n_a), (n_b, n_a))
+    ]
 
 
 def yolo_boxes(pred, anchors, classes):
@@ -141,6 +192,7 @@ def yolo_nms(outputs, anchors, masks, classes):
 
     scores = confidence * class_probs
     
+    # model.py와 다른 부분 ==================================================================
     boxes, scores, classes, valid_detections = tf.image.combined_non_max_suppression(
         boxes=tf.reshape(bbox, (tf.shape(bbox)[0], -1, 1, 4)),
         scores=tf.reshape(
@@ -150,6 +202,7 @@ def yolo_nms(outputs, anchors, masks, classes):
         iou_threshold=0.5,
         score_threshold=0.5
     )
+    # =======================================================================================
 
     return boxes, scores, classes, valid_detections
 
@@ -183,6 +236,30 @@ def YoloV3(size=None, channels=3, anchors=yolo_anchors,
                      name='yolo_nms')((boxes_0[:3], boxes_1[:3], boxes_2[:3]))
 
     return Model(inputs, outputs, name='yolov3')
+
+
+def YoloV3Tiny(size=None, channels=3, anchors=yolo_tiny_anchors,
+               masks=yolo_tiny_anchor_masks, classes=80, training=False):
+    x = inputs = Input([size, size, channels], name='input')
+
+    x_8, x = DarknetTiny(name='yolo_darknet')(x)
+
+    x = YoloConvTiny(256, name='yolo_conv_0')(x)
+    output_0 = YoloOutput(256, len(masks[0]), classes, name='yolo_output_0')(x)
+
+    x = YoloConvTiny(128, name='yolo_conv_1')((x, x_8))
+    output_1 = YoloOutput(128, len(masks[1]), classes, name='yolo_output_1')(x)
+
+    if training:
+        return Model(inputs, (output_0, output_1), name='yolov3')
+
+    boxes_0 = Lambda(lambda x: yolo_boxes(x, anchors[masks[0]], classes),
+                     name='yolo_boxes_0')(output_0)
+    boxes_1 = Lambda(lambda x: yolo_boxes(x, anchors[masks[1]], classes),
+                     name='yolo_boxes_1')(output_1)
+    outputs = Lambda(lambda x: yolo_nms(x, anchors, masks, classes),
+                     name='yolo_nms')((boxes_0[:3], boxes_1[:3]))
+    return Model(inputs, outputs, name='yolov3_tiny')
 
 
 def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
@@ -243,6 +320,8 @@ def YoloLoss(anchors, classes=80, ignore_thresh=0.5):
         return xy_loss + wh_loss + obj_loss + class_loss
     return yolo_loss
 
+
+# model.py와 다른 부분 ======================================================================
 class BatchNormalization(tf.keras.layers.BatchNormalization):
     """
     Make trainable=False freeze BN for real (the og version is sad)
@@ -253,3 +332,4 @@ class BatchNormalization(tf.keras.layers.BatchNormalization):
             training = tf.constant(False)
         training = tf.logical_and(training, self.trainable)
         return super().call(x, training)
+# ===========================================================================================
