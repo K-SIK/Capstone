@@ -238,7 +238,9 @@ def yolo_nms(outputs, anchors, masks, classes):
     )
     # =======================================================================================
     
-    return boxes, scores, classes, tf.reshape(valid_detections, (1,1))
+    # valid_detections = tf.reshape(valid_detections, (1,1))
+    valid_detections = tf.cast(valid_detections, tf.float32)
+    return boxes, scores, classes, valid_detections
 
 
 def YoloV3(size=None, channels=3, anchors=yolo_anchors,

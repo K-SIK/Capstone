@@ -103,7 +103,8 @@ class FoodDetector(context: Context) {
         val outputTensorClasses = model.getOutputTensor(2)
         val outputTensorNums = model.getOutputTensor(3)
         // ========================================================================================
-        // 모델의 반환값을 저장할 텐서 버퍼 생성 (텐서버퍼는 현재 FLOAT32와 UINT8 자료형만 지원)
+        // 모델의 반환값을 저장할 텐서 버퍼 생성
+        // 모델이 반환하는 텐서와 형상/데이터 타입이 일치해야 함. (텐서버퍼는 현재 FLOAT32와 UINT8 데이터 타입만 지원)
         // outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
         Log.i("FoodDetector", "${outputTensorBoxes.shape()}, ${outputTensorBoxes.dataType()}")
         Log.i("FoodDetector", "${outputTensorScores.shape()}, ${outputTensorScores.dataType()}")
@@ -178,9 +179,6 @@ class FoodDetector(context: Context) {
         Log.i("Model return value", "${outputBufferScores.floatArray[0]}")
         Log.i("Model return value", "${outputBufferClasses.floatArray[0]}")
         Log.i("Model return value", "${outputBufferNums.intArray[0]}")
-        for (num in outputBufferNums.intArray){
-            Log.i("For", "$num")
-        }
 
         // ========================================================================================
 
