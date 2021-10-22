@@ -48,7 +48,9 @@ class MainActivity : BaseActivity() {
                 R.id.tabPhoto -> {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
-
+                    // TODO: PhotoFragment에 모델 반환값 전달 (10/23 - )
+                    val photoFragment = PhotoFragment()
+                    supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment).commit()
                 }
                 R.id.tabAR -> {
                     // TODO: AR 기능
@@ -246,13 +248,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun callFoodDetector(bitmap: Bitmap?): String{
+    private fun callFoodDetector(bitmap: Bitmap?): Triple<Bitmap?, FloatArray, List<String>>{
         foodDetector = FoodDetector(this)
         // TODO: 모델 반환값 가공 및 반환
         Log.d("MainActivity", "called FoodDetector")
-        foodDetector.detect(bitmap)
-        // val output: Pair<String, Float> = foodDetector.detect(bitmap) ..
-        return ""
+        // 반환값: Image 비트맵, 객체 탐지 박스좌표 List, detectedFood(+probability) List
+        val output: Triple<Bitmap?, FloatArray, List<String>> = foodDetector.detect(bitmap)
+
+        return output
     }
 
     override fun onDestroy() {

@@ -1,7 +1,7 @@
 package kr.co.hanbit.foodai
 
 import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.*
 import android.os.Build
 import android.util.Log
 import androidx.annotation.NonNull
@@ -148,7 +148,7 @@ class FoodDetector(context: Context) {
     }
 
     // 4-3. 추론: 추론 메서드 정의
-    fun detect(image: Bitmap?): Pair<String, Float>{
+    fun detect(image: Bitmap?): Triple<Bitmap?, FloatArray, List<String>>{
         // 전처리된 입력 이미지 load
         // image: Bitmap / inputImage: TensorImage
         inputImage = loadImage(image)
@@ -182,15 +182,43 @@ class FoodDetector(context: Context) {
 
         // ========================================================================================
 
-        // TODO: 반환값 전처리 (10/18 - )
+        // TODO: 반환값 전처리 및 반환 (10/18 - 10/22)
         // 5-5. 추론 결과 해석: 모델이 반환한 인덱스를 라벨에 매핑하여 반환
-        val output = TensorLabel(labels, outputBuffer).getMapWithFloatValue() // Map<String, Float>
+        val boxesList = outputBufferBoxes.floatArray
+        val scoresList = outputBufferScores.floatArray
+        val classesList = outputBufferClasses.floatArray
+        val numsList = outputBufferNums.intArray
+        val labelList = labels
+        // 추론 값 반환
+//        var canvas = image?.let { Canvas(it) }
+//        val noList = mutableListOf<Int>()
+        val foodList = mutableListOf<String>()
+        for (i in 0 until numsList[0]){
+//            // 이미지에 박스 그리기
+//            canvas = drawOnCanvas(canvas, boxesList[4*i], boxesList[4*i+1], boxesList[4*i+2], boxesList[4*i+3])
+            // 객체 순서 전달
+//            noList.add(i+1)
+            // 탐지된 객체 + 확률 전달
+            val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${scoresList[i]}"
+            foodList.add(str)
+        }
 
-        return argmax(output)
-
+        return Triple(image, boxesList, foodList)
     }
 
-    // TODO: 반환값 전처리
+//    private fun drawOnCanvas(canvas: Canvas?, xmin: Float, ymin: Float, xmax: Float, ymax: Float): Canvas?{
+//        val paint = Paint()
+//        paint.style = Paint.Style.STROKE
+//        paint.strokeWidth = 10f
+//        paint.color = Color.GREEN
+//        val rect = RectF(xmin, ymin, xmax, ymax)
+//
+//        canvas?.drawRect(rect, paint)
+//
+//        return canvas
+//    }
+
+    /*
     // 5-6. 추론 결과 해석: Map에서 확률이 가장 높은 클래스명과 확률 쌍을 찾아서 반환하는 메서드 정의
     private fun argmax(map: Map<String, Float>): Pair<String, Float>{
         var maxKey = ""
@@ -206,6 +234,7 @@ class FoodDetector(context: Context) {
 
         return Pair(maxKey, maxVal)
     }
+     */
 
     // 추론 성능 개선: CPU 멀티 스레드
     private fun createMultiThreadModel(nThreads: Int): Model{
