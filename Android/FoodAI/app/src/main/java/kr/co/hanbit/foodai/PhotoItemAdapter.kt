@@ -33,6 +33,7 @@ class PhotoItemHolder(val binding: PhotoitemRecyclerBinding): RecyclerView.ViewH
     fun setPhotoItem(photoItem: PhotoItem){
         binding.textNo.text = "${photoItem.no}"
         binding.radioDetectedFood.text = "${photoItem.detectedFood}"
+        // binding.editUserInput.text = "${photoItem.userInput}"
     }
 
 }

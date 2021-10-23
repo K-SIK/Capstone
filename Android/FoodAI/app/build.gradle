@@ -65,6 +65,8 @@ dependencies {
     // TF op support.
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
     implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:0.0.0-nightly-SNAPSHOT'
+    // 리사이클러 뷰
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     // LakuePopupActivity 라이브러리
     // implementation 'com.github.lakue119:LakuePopupActivity:1.0.1'
 

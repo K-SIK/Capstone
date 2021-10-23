@@ -20,6 +20,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import kotlin.math.roundToInt
 
 
 /*텐서플로 라이트 서포트 라이브러리의 model.Model 클래스를 이용한 Classifier 클래스 구현*/
@@ -28,7 +29,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3-tiny.tflite"
+        private const val MODEL_NAME = "yolov3_tiny.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -148,7 +149,7 @@ class FoodDetector(context: Context) {
     }
 
     // 4-3. 추론: 추론 메서드 정의
-    fun detect(image: Bitmap?): Triple<Bitmap?, FloatArray, List<String>>{
+    fun detect(image: Bitmap?): Triple<Bitmap?, FloatArray, Array<String>>{
         // 전처리된 입력 이미지 load
         // image: Bitmap / inputImage: TensorImage
         inputImage = loadImage(image)
@@ -192,49 +193,21 @@ class FoodDetector(context: Context) {
         // 추론 값 반환
 //        var canvas = image?.let { Canvas(it) }
 //        val noList = mutableListOf<Int>()
-        val foodList = mutableListOf<String>()
+        val foodList = Array(numsList[0]) {""}
         for (i in 0 until numsList[0]){
 //            // 이미지에 박스 그리기
 //            canvas = drawOnCanvas(canvas, boxesList[4*i], boxesList[4*i+1], boxesList[4*i+2], boxesList[4*i+3])
             // 객체 순서 전달
 //            noList.add(i+1)
             // 탐지된 객체 + 확률 전달
-            val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${scoresList[i]}"
-            foodList.add(str)
+            val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${(scoresList[i]*10000).roundToInt()/100f}%"
+            foodList[i] = str
+            // foodList.add(str)
         }
 
         return Triple(image, boxesList, foodList)
     }
 
-//    private fun drawOnCanvas(canvas: Canvas?, xmin: Float, ymin: Float, xmax: Float, ymax: Float): Canvas?{
-//        val paint = Paint()
-//        paint.style = Paint.Style.STROKE
-//        paint.strokeWidth = 10f
-//        paint.color = Color.GREEN
-//        val rect = RectF(xmin, ymin, xmax, ymax)
-//
-//        canvas?.drawRect(rect, paint)
-//
-//        return canvas
-//    }
-
-    /*
-    // 5-6. 추론 결과 해석: Map에서 확률이 가장 높은 클래스명과 확률 쌍을 찾아서 반환하는 메서드 정의
-    private fun argmax(map: Map<String, Float>): Pair<String, Float>{
-        var maxKey = ""
-        var maxVal = -1.0f
-
-        for(entry in map.entries){
-            var f = entry.value
-            if(f > maxVal){
-                maxKey = entry.key
-                maxVal = f
-            }
-        }
-
-        return Pair(maxKey, maxVal)
-    }
-     */
 
     // 추론 성능 개선: CPU 멀티 스레드
     private fun createMultiThreadModel(nThreads: Int): Model{
