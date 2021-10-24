@@ -9,11 +9,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import kr.co.hanbit.foodai.databinding.FragmentPhotoBinding
 
 
-// TODO: 메인 액티비티로부터 전달받은 값으로 탐지된 이미지와 음식 리스트 출력
+// 메인 액티비티로부터 전달받은 값으로 탐지된 이미지와 음식 리스트 출력
 class PhotoFragment : Fragment() {
     // 메인 액티비티
     var mainActivity: MainActivity? = null
@@ -29,10 +30,16 @@ class PhotoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        // return inflater.inflate(R.layout.fragment_list, container, false)
         binding = FragmentPhotoBinding.inflate(inflater, container, false)
+        // 버튼 리스너
+        binding.btnCancel.setOnClickListener {
+            val fragmentManager = activity?.supportFragmentManager
+            fragmentManager?.beginTransaction()?.remove(this)?.commit()
+            fragmentManager?.popBackStack()
+            Toast.makeText(this.context, "작업 초기화!", Toast.LENGTH_SHORT).show()
+        }
 
-        // TODO: 이미지/리사이클러 뷰 반환값 출력 (10/24 - )
+        // 이미지/리사이클러 뷰 반환값 출력 (10/23 - 10/24)
         val imageByteArray = arguments?.getByteArray("imageByteArray")
         val image = imageByteArray?.let { BitmapFactory.decodeByteArray(imageByteArray, 0, it.size) }
         val boxesList = arguments?.getFloatArray("boxesList")
@@ -74,7 +81,7 @@ class PhotoFragment : Fragment() {
     fun loadData(foodList: Array<String>?): MutableList<PhotoItem>{
         // 리턴할 MutableList 컬렉션
         val data: MutableList<PhotoItem> = mutableListOf()
-        // TODO: 모델 반환값 받고 리스트에 저장
+        // 모델 반환값 받고 리스트에 저장
         var i = 0
         if (foodList != null) {
             for (food in foodList){

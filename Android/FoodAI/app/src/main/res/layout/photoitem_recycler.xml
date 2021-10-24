@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="120dp"
     android:background="@drawable/border">
 
     <TextView
@@ -23,7 +23,7 @@
         <RadioButton
             android:id="@+id/radioDetectedFood"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:checked="true"
             android:text="인식된 객체" />
@@ -31,19 +31,20 @@
         <RadioButton
             android:id="@+id/radioUserInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:text="직접 입력" />
 
         <EditText
             android:id="@+id/editUserInput"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:ems="10"
-            android:enabled="false"
+            android:enabled="true"
             android:hint="직접 입력"
             android:inputType="textPersonName"
+            android:textSize="14sp"
             android:visibility="visible" />
     </RadioGroup>
 </LinearLayout>
