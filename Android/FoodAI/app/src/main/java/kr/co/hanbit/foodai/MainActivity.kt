@@ -33,6 +33,7 @@ class MainActivity : BaseActivity() {
     // 전역 프로퍼티
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
     var photoUri: Uri? = null
+    var photoFragment: PhotoFragment? = null
     lateinit var foodDetector: FoodDetector
 
 
@@ -49,6 +50,12 @@ class MainActivity : BaseActivity() {
                 R.id.tabPhoto -> {
                     // 카메라 권한 요청
                     requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
+                    if (photoFragment != null){
+                        val fragmentManager = supportFragmentManager
+                        fragmentManager.beginTransaction().remove(photoFragment!!).commit()
+                        fragmentManager.popBackStack()
+                        Toast.makeText(this.context, "작업 초기화!", Toast.LENGTH_SHORT).show()
+                    }
                     // TODO: PhotoFragment에 모델 반환값 전달 (10/23 - )
                     Log.d("tabPhoto", "PhotoFragment called")
 //                    val photoFragment = PhotoFragment()
@@ -252,7 +259,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setPhotoFragment(data: Triple<Bitmap?, FloatArray, Array<String>>){
-        val photoFragment = PhotoFragment()
+        photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
         Toast.makeText(this, "PhotoFragment 호출", Toast.LENGTH_SHORT).show()
 
@@ -270,9 +277,9 @@ class MainActivity : BaseActivity() {
         bundle.putStringArray("foodList", foodList)
 
         // 값이 담긴 번들을 프래그먼트의 arguments에 담는다.
-        photoFragment.arguments = bundle
+        photoFragment!!.arguments = bundle
 
-        supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment!!).commit()
     }
 
     private fun callFoodDetector(bitmap: Bitmap?): Triple<Bitmap?, FloatArray, Array<String>>{
