@@ -29,7 +29,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3-tiny.tflite"
+        private const val MODEL_NAME = "yolov3_dynamic_range.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -51,7 +51,6 @@ class FoodDetector(context: Context) {
     var modelInputWidth: Int = 0
     var modelInputHeight: Int = 0
     // 4-1. 추론: 모델의 추론된 출력 값을 저장할 프로퍼티 선언
-    lateinit var outputBuffer: TensorBuffer
     lateinit var outputBufferBoxes: TensorBuffer
     lateinit var outputBufferScores: TensorBuffer
     lateinit var outputBufferClasses: TensorBuffer
@@ -97,8 +96,6 @@ class FoodDetector(context: Context) {
         // 4-2. 추론: 모델의 출력값을 저장할 TensorBuffer 생성
         // ========================================================================================
         // 모델 출력값 참조
-        // val outputTensor = interpreter.getOutputTensor(0)
-        // val outputTensor = model.getOutputTensor(0)
         val outputTensorBoxes = model.getOutputTensor(0)
         val outputTensorScores = model.getOutputTensor(1)
         val outputTensorClasses = model.getOutputTensor(2)
@@ -106,7 +103,6 @@ class FoodDetector(context: Context) {
         // ========================================================================================
         // 모델의 반환값을 저장할 텐서 버퍼 생성
         // 모델이 반환하는 텐서와 형상/데이터 타입이 일치해야 함. (텐서버퍼는 현재 FLOAT32와 UINT8 데이터 타입만 지원)
-        // outputBuffer = TensorBuffer.createFixedSize(outputTensor.shape(), outputTensor.dataType())
         Log.i("FoodDetector", "${outputTensorBoxes.shape()}, ${outputTensorBoxes.dataType()}")
         Log.i("FoodDetector", "${outputTensorScores.shape()}, ${outputTensorScores.dataType()}")
         Log.i("FoodDetector", "${outputTensorClasses.shape()}, ${outputTensorClasses.dataType()}")
@@ -129,7 +125,6 @@ class FoodDetector(context: Context) {
             else
                 inputImage.load(bitmap)
         }
-        // inputImage?.load(bitmap)
 
         // 전처리 ImageProcessor 정의
         val imageProcessor =
@@ -167,8 +162,6 @@ class FoodDetector(context: Context) {
         outputs.put(2, outputBufferClasses.buffer.rewind() as Any)
         outputs.put(3, outputBufferNums.buffer.rewind() as Any)
 
-        // val outputs = mutableListOf<TensorBuffer>()
-        // outputs.put(0, outputBuffer.buffer.rewind() as Any)
         Log.d("FoodDetector", "Output buffer created")
         /* ==========10/16 수정 - 다중 반환값을 받기 위해 Model 클래스 대신 Interpreter 클래스 사용 ====== */
         model.runForMultipleInputsOutputs(inputs, outputs)
@@ -191,18 +184,11 @@ class FoodDetector(context: Context) {
         val numsList = outputBufferNums.intArray
         val labelList = labels
         // 추론 값 반환
-//        var canvas = image?.let { Canvas(it) }
-//        val noList = mutableListOf<Int>()
         val foodList = Array(numsList[0]) {""}
         for (i in 0 until numsList[0]){
-//            // 이미지에 박스 그리기
-//            canvas = drawOnCanvas(canvas, boxesList[4*i], boxesList[4*i+1], boxesList[4*i+2], boxesList[4*i+3])
-            // 객체 순서 전달
-//            noList.add(i+1)
             // 탐지된 객체 + 확률 전달
             val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${(scoresList[i]*10000).roundToInt()/100f}%"
             foodList[i] = str
-            // foodList.add(str)
         }
 
         return Triple(image, boxesList, foodList)
