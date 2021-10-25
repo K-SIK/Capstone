@@ -83,7 +83,7 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
         db.execSQL(delete)
         db.close()
         // 쓰기 전용 데이터베이스에서 삭제
-        // 파라미터: 테이블명, 삭제할 조건, 조건파라미터 
+        // 파라미터: 테이블명, 삭제할 조건, 조건파라미터
         val wd = writableDatabase
         wd.delete("listitem", "no = ${item.no}", null)
         wd.close()
