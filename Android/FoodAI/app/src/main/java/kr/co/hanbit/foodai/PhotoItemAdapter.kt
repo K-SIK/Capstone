@@ -6,7 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kr.co.hanbit.foodai.databinding.PhotoitemRecyclerBinding
 
 class PhotoItemAdapter: RecyclerView.Adapter<PhotoItemHolder>() {
+    // 존재하는 데이터 리스트
     var listData = mutableListOf<PhotoItem>()
+    // SQliteHelper 프로퍼티
+    var helper: SqliteHelper? = null
 
     // 스마트폰의 한 화면에 그려지는 아이템 개수만큼 아이템 레이아웃 생성
     // 안드로이드는 ViewHolder 클래스를 메모리에 저장했다가 요청이 있을 때마다 메서드를 실행하여 꺼내서 사용한다.

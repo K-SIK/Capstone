@@ -4,17 +4,14 @@ import android.content.Context
 import android.graphics.*
 import android.os.Build
 import android.util.Log
-import androidx.annotation.NonNull
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.support.common.FileUtil
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.label.TensorLabel
 import org.tensorflow.lite.support.model.Model
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.IOException
@@ -29,7 +26,7 @@ class FoodDetector(context: Context) {
     companion object{
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
-        private const val MODEL_NAME = "yolov3_dynamic_range.tflite"
+        private const val MODEL_NAME = "yolov3-tiny.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
@@ -144,7 +141,7 @@ class FoodDetector(context: Context) {
     }
 
     // 4-3. 추론: 추론 메서드 정의
-    fun detect(image: Bitmap?): Triple<Bitmap?, FloatArray, Array<String>>{
+    fun detect(image: Bitmap?): Pair<FloatArray, Array<String>> {
         // 전처리된 입력 이미지 load
         // image: Bitmap / inputImage: TensorImage
         inputImage = loadImage(image)
@@ -190,8 +187,8 @@ class FoodDetector(context: Context) {
             val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${(scoresList[i]*10000).roundToInt()/100f}%"
             foodList[i] = str
         }
-
-        return Triple(image, boxesList, foodList)
+        // 객체탐지박스 좌표 리스트, 음식_확률 리스트
+        return Pair(boxesList, foodList)
     }
 
 

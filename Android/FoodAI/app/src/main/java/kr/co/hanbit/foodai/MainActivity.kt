@@ -7,16 +7,13 @@ import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 import java.io.IOException
 import java.text.SimpleDateFormat
-import kr.co.hanbit.foodai.FoodDetector
 import java.io.ByteArrayOutputStream
 
 class MainActivity : BaseActivity() {
@@ -58,8 +55,6 @@ class MainActivity : BaseActivity() {
                     }
                     // TODO: PhotoFragment에 모델 반환값 전달 (10/23 - )
                     Log.d("tabPhoto", "PhotoFragment called")
-//                    val photoFragment = PhotoFragment()
-//                    supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment).commit()
                 }
                 R.id.tabAR -> {
                     // TODO: AR 기능
@@ -220,12 +215,11 @@ class MainActivity : BaseActivity() {
                     lateinit var result: Triple<Bitmap?, FloatArray, Array<String>>
                     photoUri?.let{ uri ->
                         val capturedImage = loadBitmap(uri)
-                        photoUri = null
                         // 비트맵을 모델에 전달하여 추론 수행
-                        result = callFoodDetector(capturedImage)
+                        val (boxesList, foodList) = callFoodDetector(capturedImage)
+                        setPhotoFragment(Triple(uri, boxesList, foodList))
+                        photoUri = null
                     }
-                    // TODO: 모델 반환값 처리 및 출력(10/23 - )
-                    setPhotoFragment(result)
 
                 }
                 REQ_STORAGE -> {
@@ -233,9 +227,8 @@ class MainActivity : BaseActivity() {
                     val selectedImageUri: Uri = data?.data as Uri
                     val selectedImage = loadBitmap(selectedImageUri)
                     // 비트맵을 모델에 전달하여 추론 수행
-                    val result = callFoodDetector(selectedImage)
-                    // TODO: 모델 반환값 처리 및 출력(10/23 - )
-                    setPhotoFragment(result)
+                    val (boxesList, foodList) = callFoodDetector(selectedImage)
+                    setPhotoFragment(Triple(selectedImageUri, boxesList, foodList))
 
                 }
 
@@ -258,19 +251,20 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setPhotoFragment(data: Triple<Bitmap?, FloatArray, Array<String>>){
+    private fun setPhotoFragment(data: Triple<Uri, FloatArray?, Array<String>>){
         photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
         Toast.makeText(this, "PhotoFragment 호출", Toast.LENGTH_SHORT).show()
 
         // 번들을 생성하고 전달할 값을 담는다.
         var bundle = Bundle()
-        val (image, boxesList, foodList) = data
+        val (imageUri, boxesList, foodList) = data
         // 이미지
-        val stream = ByteArrayOutputStream()
-        image?.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        val imageByteArray = stream.toByteArray()
-        bundle.putByteArray("imageByteArray", imageByteArray)
+//        val stream = ByteArrayOutputStream()
+//        image?.compress(Bitmap.CompressFormat.PNG, 100, stream)
+//        val imageByteArray = stream.toByteArray()
+//        bundle.putByteArray("imageByteArray", imageByteArray)
+        bundle.putString("imageUri", imageUri.toString())
         // 박스 좌표 리스트
         bundle.putFloatArray("boxesList", boxesList)
         // 음식+확률 문자열 리스트
@@ -282,12 +276,12 @@ class MainActivity : BaseActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment!!).commit()
     }
 
-    private fun callFoodDetector(bitmap: Bitmap?): Triple<Bitmap?, FloatArray, Array<String>>{
+    private fun callFoodDetector(bitmap: Bitmap?): Pair<FloatArray, Array<String>>{
         foodDetector = FoodDetector(this)
         // TODO: 모델 반환값 가공 및 반환
         Log.d("MainActivity", "called FoodDetector")
         // 반환값: Image 비트맵, 객체 탐지 박스좌표 List, detectedFood(+probability) List
-        val output: Triple<Bitmap?, FloatArray, Array<String>> = foodDetector.detect(bitmap)
+        val output: Pair<FloatArray, Array<String>> = foodDetector.detect(bitmap)
         Log.d("MainActivity", "return model output")
         return output
     }
