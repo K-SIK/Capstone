@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import kr.co.hanbit.foodai.databinding.FragmentPhotoBinding
 import java.io.IOException
+import java.text.SimpleDateFormat
 
 
 // 메인 액티비티로부터 전달받은 값으로 탐지된 이미지와 음식 리스트 출력
@@ -23,6 +24,8 @@ class PhotoFragment : Fragment() {
     var mainActivity: MainActivity? = null
     // 바인딩 될 레이아웃
     lateinit var binding: FragmentPhotoBinding
+    // Sqlite 인스턴스
+    val helper = SqliteHelper(this.requireContext(), "listitem", 1)
 
     // 액티비티가 프래그먼트를 요청하면 onCreateView() 메서드를 통해 뷰를 만들어서 보여줌(리사이클러뷰의 onCreateViewHolder 메서드와 유사)
     // 파라미터 1: 레이아웃 파일을 로드하기 위한 레이아웃 인플레이터를 기본 제공
@@ -34,29 +37,37 @@ class PhotoFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentPhotoBinding.inflate(inflater, container, false)
+        // 데이터 수신 (10/23 - 10/24)
+        val imageUri = arguments?.getString("imageUri")
+        val image = loadBitmap(imageUri)
+        val boxesList = arguments?.getFloatArray("boxesList")
+        val foodList = arguments?.getStringArray("foodList")
+
         // 버튼 리스너
         binding.btnCancel.setOnClickListener {
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.beginTransaction()?.remove(this)?.commit()
             fragmentManager?.popBackStack()
-            Toast.makeText(this.context, "작업 초기화!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this.context, "취소되었습니다", Toast.LENGTH_SHORT).show()
         }
         binding.btnSave.setOnClickListener {
+            // TODO: 데이터 저장 확인 팝업창
 
+
+            // 리사이클러 뷰의 아이템들을 DB에 저장
+            val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+            val datetime = sdf.format(System.currentTimeMillis())
+            val listItem = ListItem(null, datetime, imageUri!!, foodList!!, null)
+            helper.insertItem(listItem)
+            // TODO: 데이터베이스 데이터가 변하면 ListFragment 리사이클러뷰에 업데이트
+
+
+            val fragmentManager = activity?.supportFragmentManager
+            fragmentManager?.beginTransaction()?.remove(this)?.commit()
+            fragmentManager?.popBackStack()
+            Toast.makeText(this.context, "저장되었습니다", Toast.LENGTH_SHORT).show()
         }
 
-        // 이미지/리사이클러 뷰 반환값 출력 (10/23 - 10/24)
-//        val imageByteArray = arguments?.getByteArray("imageByteArray")
-//        val image = imageByteArray?.let { BitmapFactory.decodeByteArray(imageByteArray, 0, it.size) }
-        val imageUri = arguments?.getString("imageUri")
-        val image = loadBitmap(imageUri)
-        val boxesList = arguments?.getFloatArray("boxesList")
-        val foodList = arguments?.getStringArray("foodList")
-        if (foodList != null) {
-            for (food in foodList){
-                Log.i("FoodList", food)
-            }
-        }
         // 이미지뷰 출력
         val w = image?.width!!
         val h = image?.height!!
@@ -108,7 +119,7 @@ class PhotoFragment : Fragment() {
     private fun drawOnCanvas(canvas: Canvas?, xmin: Float, ymin: Float, xmax: Float, ymax: Float): Canvas{
         val paint = Paint()
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
+        paint.strokeWidth = 3f
         paint.color = Color.GREEN
         val rect = RectF(xmin, ymin, xmax, ymax)
 

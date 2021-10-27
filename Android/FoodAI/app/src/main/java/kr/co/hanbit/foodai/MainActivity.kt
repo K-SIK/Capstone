@@ -254,16 +254,12 @@ class MainActivity : BaseActivity() {
     private fun setPhotoFragment(data: Triple<Uri, FloatArray?, Array<String>>){
         photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
-        Toast.makeText(this, "PhotoFragment 호출", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "잠시만 기다려주세요...", Toast.LENGTH_LONG).show()
 
         // 번들을 생성하고 전달할 값을 담는다.
         var bundle = Bundle()
         val (imageUri, boxesList, foodList) = data
-        // 이미지
-//        val stream = ByteArrayOutputStream()
-//        image?.compress(Bitmap.CompressFormat.PNG, 100, stream)
-//        val imageByteArray = stream.toByteArray()
-//        bundle.putByteArray("imageByteArray", imageByteArray)
+        // 이미지 주소
         bundle.putString("imageUri", imageUri.toString())
         // 박스 좌표 리스트
         bundle.putFloatArray("boxesList", boxesList)
