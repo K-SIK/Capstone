@@ -16,11 +16,11 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
         // 테이블 생성 쿼리
         val create = "create table listitem" +
                 "(" +
-                "no integer primary key" // 순서
-                "datetime text, " +      // 날짜/시간
-                "imageuri text, " +      // 이미지 주소
-                "foodlist text" +        // 음식 리스트
-                "diary text" +           // 일기 및 기록장
+                "no integer primary key, " + // 순서
+                "datetime text, " +          // 날짜/시간
+                "imageuri text, " +          // 이미지 주소
+                "foodlist text, " +          // 음식 리스트
+                "diary text" +               // 일기 및 기록장
                 ")"
         // DB의 execSQL 메서드에 전달하여 쿼리 실행
         db?.execSQL(create)
@@ -34,7 +34,7 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     // INSERT
     fun insertItem(item: ListItem){
         // 삽입할 데이터 작성
-        val query = "insert into listitem(datetime, imageuri, foodlist, diary)" +
+        val query = "insert into listitem(datetime, imageuri, foodlist, diary) " +
                 "values('${item.datetime}', '${item.imageUri}', '${convertArrayToString(item.foodList, ",")}', '${item.diary}')"
 
         val db = writableDatabase
