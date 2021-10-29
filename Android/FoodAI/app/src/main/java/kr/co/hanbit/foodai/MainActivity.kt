@@ -31,6 +31,7 @@ class MainActivity : BaseActivity() {
     val binding by lazy {ActivityMainBinding.inflate(layoutInflater)}
     var photoUri: Uri? = null
     var photoFragment: PhotoFragment? = null
+    var listFragment: ListFragment? = null
     lateinit var foodDetector: FoodDetector
 
 
@@ -45,8 +46,9 @@ class MainActivity : BaseActivity() {
         bnv_main.run { setOnNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.tabPhoto -> {
-                    // 카메라 권한 요청
-                    requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
+                    // 카메라/갤러리 선택
+                    val intent = Intent(this@MainActivity, PopupActivity::class.java)
+                    startActivityForResult(intent, POPUP_ACTIVITY)
                     if (photoFragment != null){
                         val fragmentManager = supportFragmentManager
                         fragmentManager.beginTransaction().remove(photoFragment!!).commit()
@@ -88,13 +90,12 @@ class MainActivity : BaseActivity() {
         when(requestCode){
             // 외부 저장소 권한
             PERM_STORAGE -> {
-
+                // 카메라 권한 요청
+                requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
             }
             // 카메라 권한
             PERM_CAMERA -> {
-                // 카메라/갤러리 선택
-                val intent = Intent(this@MainActivity, PopupActivity::class.java)
-                startActivityForResult(intent, POPUP_ACTIVITY)
+                
             }
             // 카메라 호출
             REQ_CAMERA -> {

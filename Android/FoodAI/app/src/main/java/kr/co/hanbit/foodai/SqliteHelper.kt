@@ -90,11 +90,17 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     }
 
     // 리스트 - 문자열 변환 메서드
-    private fun convertArrayToString(array: Array<String>, delimeter: String): String? {
+    fun convertArrayToString(array: Array<String>, delimeter: String): String? {
         return TextUtils.join(delimeter, array)
     }
-    private fun convertStringToArray(str: String, delimeter: String): Array<String> {
-        return str.split(delimeter) as Array<String>
+    fun convertStringToArray(str: String, delimeter: String): Array<String> {
+        val arrayList = str.split(delimeter)
+        val stringArray = Array(arrayList.size){""}
+        for (i in 0 until arrayList.size){
+            stringArray[i] = arrayList[i]
+        }
+        return stringArray
+        // return str.split(delimeter) as Array<String>
     }
 
 }

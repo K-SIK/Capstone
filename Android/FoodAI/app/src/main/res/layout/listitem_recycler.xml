@@ -47,8 +47,9 @@
             <TextView
                 android:id="@+id/textFoodList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="AAA, BBB, CCC, DDD, EEE, FFF, GGG, HHH, III, JJJ, KKK, LLL, MMM, NNN" />
+                android:layout_height="55dp"
+                android:gravity="center"
+                android:text="aa" />
         </LinearLayout>
 
         <LinearLayout
