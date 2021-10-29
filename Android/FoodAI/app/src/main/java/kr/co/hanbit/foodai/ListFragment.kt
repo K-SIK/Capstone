@@ -10,18 +10,60 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import kr.co.hanbit.foodai.databinding.FragmentListBinding
+import kr.co.hanbit.foodai.databinding.FragmentPhotoBinding
 import java.io.IOException
 
 
 class ListFragment : Fragment() {
+    // 메인 액티비티
+    var mainActivity: MainActivity? = null
+    // 바인딩 될 레이아웃
+    lateinit var binding: FragmentListBinding
+    // Sqlite 인스턴스
+    lateinit var helper: SqliteHelper
+    // 리사이클러 뷰 어댑터
+    lateinit var adapter: ListItemAdapter
+    // 컨텍스트
+    // lateinit var
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list, container, false)
+        binding = FragmentListBinding.inflate(inflater, container, false)
+        // Inflate the Sqlitehelper for this fragment
+        helper = SqliteHelper(this.requireContext(), "listitem", 1)
+
+        // DB에서 데이터 가져오기
+        adapter = ListItemAdapter()
+        adapter.helper = helper
+        adapter.context = this.context
+        adapter.listData.addAll(helper.selectItem())
+//        for (item in helper.selectItem()){
+//            val (no, datetime, imageUri, foodList, diary) = item
+//            val image =
+//        }
+
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+
+
+
+        return binding.root
     }
+
+//    // DB에 있는 아이템들을 가져오는 메서드
+//    fun loadData(): MutableList<ListItem>{
+//        val data: MutableList<ListItem> = mutableListOf()
+//
+//
+//
+//        return data
+//    }
 
 
     // Uri를 이용해서 미디어스토어에 저장된 이미지를 읽어오는 메서드

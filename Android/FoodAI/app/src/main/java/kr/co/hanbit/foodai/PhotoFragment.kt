@@ -41,7 +41,7 @@ class PhotoFragment : Fragment() {
         binding = FragmentPhotoBinding.inflate(inflater, container, false)
         // Inflate the Sqlitehelper for this fragment
         helper = SqliteHelper(this.requireContext(), "listitem", 1)
-        // 데이터 수신 (10/23 - 10/24)
+        // MainActivity로부터 데이터 수신 (10/23 - 10/24)
         val imageUri = arguments?.getString("imageUri")
         val image = loadBitmap(imageUri)
         val boxesList = arguments?.getFloatArray("boxesList")
