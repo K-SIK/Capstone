@@ -25,7 +25,9 @@ class PhotoFragment : Fragment() {
     // 바인딩 될 레이아웃
     lateinit var binding: FragmentPhotoBinding
     // Sqlite 인스턴스
-    val helper = SqliteHelper(this.requireContext(), "listitem", 1)
+    lateinit var helper: SqliteHelper
+    // 리사이클러 뷰 어댑터
+    lateinit var adapter: PhotoItemAdapter
 
     // 액티비티가 프래그먼트를 요청하면 onCreateView() 메서드를 통해 뷰를 만들어서 보여줌(리사이클러뷰의 onCreateViewHolder 메서드와 유사)
     // 파라미터 1: 레이아웃 파일을 로드하기 위한 레이아웃 인플레이터를 기본 제공
@@ -37,6 +39,8 @@ class PhotoFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         binding = FragmentPhotoBinding.inflate(inflater, container, false)
+        // Inflate the Sqlitehelper for this fragment
+        helper = SqliteHelper(this.requireContext(), "listitem", 1)
         // 데이터 수신 (10/23 - 10/24)
         val imageUri = arguments?.getString("imageUri")
         val image = loadBitmap(imageUri)
@@ -55,17 +59,32 @@ class PhotoFragment : Fragment() {
 
 
             // 리사이클러 뷰의 아이템들을 DB에 저장
+            val foodListToSave = Array(adapter.listData.size){""} // 아이템 개수만큼 공간 할당
+            var i = -1
+            for (item in adapter.listData){
+                i += 1
+                if(item.userInput == null){ // save detectedFood
+                    val (food, probability) = item.detectedFood.split("\t")
+                    foodListToSave[i] = food
+                }else{ // save userInput
+                    foodListToSave[i] = item.userInput!!
+                }
+                Log.i("foodListToSave", foodListToSave[i])
+            }
             val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
             val datetime = sdf.format(System.currentTimeMillis())
-            val listItem = ListItem(null, datetime, imageUri!!, foodList!!, null)
+            val listItem = ListItem(null, datetime, imageUri!!, foodListToSave, null)
             helper.insertItem(listItem)
-            // TODO: 데이터베이스 데이터가 변하면 ListFragment 리사이클러뷰에 업데이트
-
+            Log.d("PhotoFragment", "Item inserted")
 
             val fragmentManager = activity?.supportFragmentManager
             fragmentManager?.beginTransaction()?.remove(this)?.commit()
             fragmentManager?.popBackStack()
             Toast.makeText(this.context, "저장되었습니다", Toast.LENGTH_SHORT).show()
+
+            // TODO: 데이터베이스 데이터가 변하면 ListFragment 리사이클러뷰에 업데이트
+
+
         }
 
         // 이미지뷰 출력
@@ -88,7 +107,7 @@ class PhotoFragment : Fragment() {
         val data = loadData(foodList)
         Log.d("PhotoFragment", "Data loaded")
 
-        val adapter = PhotoItemAdapter()
+        adapter = PhotoItemAdapter()
         adapter.listData = data
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
@@ -108,7 +127,7 @@ class PhotoFragment : Fragment() {
                 // val detectedFood = food
                 // val userInput = ""
                 // 아이템 인스턴스 생성 후 반환할 리스트에 추가
-                val photoItem = PhotoItem(i, food, "")
+                val photoItem = PhotoItem(i, food, null)
                 data.add(photoItem)
             }
         }
