@@ -1,5 +1,6 @@
 package kr.co.hanbit.foodai
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -26,7 +27,7 @@ class ListFragment : Fragment() {
     // 리사이클러 뷰 어댑터
     lateinit var adapter: ListItemAdapter
     // 컨텍스트
-    // lateinit var
+    // lateinit var context: Context
 
 
     override fun onCreateView(
@@ -50,6 +51,8 @@ class ListFragment : Fragment() {
 
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
+
+
 
 
 

@@ -20,7 +20,7 @@ class MainActivity : BaseActivity() {
 
     // 권한 관련 상수 선언
     companion object{
-        const val PERM_STORAGE = 99 // 외부 저장소 권한 요청
+        const val PERM_STORAGE = 99 // 외부 저장소 쓰기 권한 요청
         const val PERM_CAMERA = 100 // 카메라 권한 요청
         const val REQ_CAMERA = 101  // 카메라 호출
         const val REQ_STORAGE = 102 // 갤러리 호출
@@ -38,6 +38,9 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        // 외부 저장소(갤러리) 권한 요청
+        requirePermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERM_STORAGE)
 
         // 하단 탭이 눌렸을 때 화면을 전환하기 위해선 이벤트 처리하기 위해 BottomNavigationView 객체 생성
         val bnv_main = binding.bnvMain
@@ -81,8 +84,6 @@ class MainActivity : BaseActivity() {
             selectedItemId = R.id.tabHome
         }
 
-        // 외부 저장소(갤러리) 권한 요청
-        requirePermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERM_STORAGE)
     }
 
     // 권한 요청 승인 시 호출
@@ -93,9 +94,10 @@ class MainActivity : BaseActivity() {
                 // 카메라 권한 요청
                 requirePermissions(arrayOf(Manifest.permission.CAMERA), PERM_CAMERA)
             }
+            // 외부 저장소
             // 카메라 권한
             PERM_CAMERA -> {
-                
+
             }
             // 카메라 호출
             REQ_CAMERA -> {
@@ -118,6 +120,7 @@ class MainActivity : BaseActivity() {
                 Toast.makeText(baseContext,
                                 "카메라 권한을 승인해야 카메라를 사용할 수 있습니다.",
                                 Toast.LENGTH_LONG).show()
+                finish()
 
             }
             // 카메라 호출

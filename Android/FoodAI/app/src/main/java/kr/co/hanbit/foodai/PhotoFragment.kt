@@ -5,6 +5,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.LinearLayoutManager
 import kr.co.hanbit.foodai.databinding.FragmentPhotoBinding
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 
@@ -59,6 +61,7 @@ class PhotoFragment : Fragment() {
 
 
             // 리사이클러 뷰의 아이템들을 DB에 저장
+            // 음식 리스트 생성
             val foodListToSave = Array(adapter.listData.size){""} // 아이템 개수만큼 공간 할당
             var i = -1
             for (item in adapter.listData){
@@ -71,9 +74,17 @@ class PhotoFragment : Fragment() {
                 }
                 Log.i("foodListToSave", foodListToSave[i])
             }
+            // 날짜 생성
             val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
             val datetime = sdf.format(System.currentTimeMillis())
-            val listItem = ListItem(null, datetime, imageUri!!, foodListToSave, null)
+            // 이미지 ByteArray 생성
+            val image = loadBitmap(imageUri)
+            val stream = ByteArrayOutputStream()
+            image!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            val imageByteArray = stream.toByteArray()
+            val imageString = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
+            // 아이템 저장
+            val listItem = ListItem(null, datetime, imageString, foodListToSave, "")
             helper.insertItem(listItem)
             Log.d("PhotoFragment", "Item inserted")
 

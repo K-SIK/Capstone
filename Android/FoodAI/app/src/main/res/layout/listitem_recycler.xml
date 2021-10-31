@@ -3,79 +3,115 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="160dp">
+    android:layout_height="200dp"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_weight="4"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/textDatetime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="0000-00-00 XX:XX:XX" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/imageViewList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            tools:srcCompat="@tools:sample/avatars" />
+            <TextView
+                android:id="@+id/textDatetime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0000-00-00 XX:XX:XX"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:id="@+id/imageViewList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                tools:srcCompat="@tools:sample/avatars" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textFoodListTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="먹은 음식"
+                    android:textColor="@android:color/holo_green_light" />
+
+                <TextView
+                    android:id="@+id/textFoodList"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:gravity="center"
+                    android:text="aa"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textDiaryTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="한 줄 일기"
+                    android:textColor="@android:color/holo_green_light" />
+
+                <EditText
+                    android:id="@+id/editTextDiary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="한 줄 일기를 입력하세요!"
+                    android:inputType="textMultiLine|textPersonName"
+                    android:textColorHint="@color/cardview_dark_background"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
+        <Button
+            android:id="@+id/btnSaveListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:text="저장하기" />
 
-            <TextView
-                android:id="@+id/textFoodListTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="먹은 음식" />
-
-            <TextView
-                android:id="@+id/textFoodList"
-                android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:gravity="center"
-                android:text="aa" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textDiaryTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="한 줄 일기" />
-
-            <EditText
-                android:id="@+id/editTextDiary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="한 줄 일기를 입력하세요!"
-                android:inputType="textMultiLine|textPersonName"
-                android:textSize="14sp" />
-        </LinearLayout>
-
+        <Button
+            android:id="@+id/btnDeleteListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="삭제하기" />
     </LinearLayout>
 
 </LinearLayout>

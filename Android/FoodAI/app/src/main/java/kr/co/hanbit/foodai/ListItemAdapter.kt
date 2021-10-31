@@ -2,12 +2,15 @@ package kr.co.hanbit.foodai
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import kr.co.hanbit.foodai.databinding.ListitemRecyclerBinding
@@ -25,10 +28,38 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
     inner class ListItemHolder(val binding: ListitemRecyclerBinding): RecyclerView.ViewHolder(binding.root){
 
         fun setListItem(listItem: ListItem){
-            // TODO: DB에서 아이템 가져와서 값 설정
-            binding.imageViewList.setImageBitmap(loadBitmap(listItem.imageUri.toUri()))
+            // DB에서 아이템 가져와서 값 설정
+            val imageByteArray = Base64.decode(listItem.imageString, Base64.DEFAULT)
+            binding.imageViewList.setImageBitmap(BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.size))
             binding.textDatetime.text = listItem.datetime
             binding.textFoodList.text = helper!!.convertArrayToString(listItem.foodList, ",")
+            binding.editTextDiary.setText(listItem.diary)
+            // 저장 버튼
+            binding.btnSaveListItem.setOnClickListener {
+                // TODO: 저장하시겠습니까? 팝업창
+
+                // 아이템 수정 (한줄 일기 업데이트)
+                // listItem.diary = binding.editTextDiary.text.toString()
+                helper!!.updateItem(ListItem(listItem.no, listItem.datetime, listItem.imageString, listItem.foodList, binding.editTextDiary.text.toString()))
+                // 리사이클러뷰에 업데이트
+                listData.clear()
+                listData.addAll(helper!!.selectItem())
+                notifyDataSetChanged()
+                Toast.makeText(context, "저장되었습니다", Toast.LENGTH_SHORT).show()
+            }
+            // 삭제 버튼
+            binding.btnDeleteListItem.setOnClickListener {
+                // TODO: 삭제하시겠습니다? 팝업창
+
+                // 아이템 삭제
+                helper!!.deleteItem(listItem)
+                // 리사이클러뷰에 업데이트
+                listData.clear()
+                listData.addAll(helper!!.selectItem())
+                notifyDataSetChanged()
+                Toast.makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+            }
+
         }
     }
 
@@ -48,24 +79,5 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
         return listData.size
     }
 
-    // Uri를 이용해서 미디어스토어에 저장된 이미지를 읽어오는 메서드
-    // 파라미터로 Uri를 받아 결괏괎을 Bitmap으로 반환
-    fun loadBitmap(photoUri: Uri): Bitmap?{
-        var image: Bitmap? = null
-        // API 버전이 27 이하이면 MediaStore에 있는 getBitmap 메서드를 사용하고, 27보다 크면 ImageDecoder 사용
-        try{
-            image = if (Build.VERSION.SDK_INT > 27){
-                val source: ImageDecoder.Source =
-                    ImageDecoder.createSource(this.context!!.contentResolver, photoUri)
-                ImageDecoder.decodeBitmap(source)
-            }else{
-                MediaStore.Images.Media.getBitmap(this.context!!.contentResolver, photoUri)
-            }
-        }catch(e: IOException){
-            e.printStackTrace()
-        }
-
-        return image
-    }
 
 }
