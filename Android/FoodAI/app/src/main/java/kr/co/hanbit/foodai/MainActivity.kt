@@ -216,12 +216,11 @@ class MainActivity : BaseActivity() {
                 }
                 REQ_CAMERA -> {
                     Toast.makeText(baseContext, "사진 촬영 완료!", Toast.LENGTH_SHORT).show()
-                    lateinit var result: Triple<Bitmap?, FloatArray, Array<String>>
                     photoUri?.let{ uri ->
                         val capturedImage = loadBitmap(uri)
                         // 비트맵을 모델에 전달하여 추론 수행
                         val (boxesList, foodList) = callFoodDetector(capturedImage)
-                        setPhotoFragment(Triple(uri, boxesList, foodList))
+                        setPhotoFragment(Triple(capturedImage, boxesList, foodList))
                         photoUri = null
                     }
 
@@ -232,7 +231,7 @@ class MainActivity : BaseActivity() {
                     val selectedImage = loadBitmap(selectedImageUri)
                     // 비트맵을 모델에 전달하여 추론 수행
                     val (boxesList, foodList) = callFoodDetector(selectedImage)
-                    setPhotoFragment(Triple(selectedImageUri, boxesList, foodList))
+                    setPhotoFragment(Triple(selectedImage, boxesList, foodList))
 
                 }
 
@@ -255,16 +254,19 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setPhotoFragment(data: Triple<Uri, FloatArray?, Array<String>>){
+    private fun setPhotoFragment(data: Triple<Bitmap?, FloatArray?, Array<String>>){
         photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
         Toast.makeText(this, "잠시만 기다려주세요...", Toast.LENGTH_LONG).show()
 
         // 번들을 생성하고 전달할 값을 담는다.
         var bundle = Bundle()
-        val (imageUri, boxesList, foodList) = data
-        // 이미지 주소
-        bundle.putString("imageUri", imageUri.toString())
+        val (image, boxesList, foodList) = data
+        // 이미지
+        val stream = ByteArrayOutputStream()
+        image?.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val imageByteArray = stream.toByteArray()
+        bundle.putByteArray("imageByteArray", imageByteArray)
         // 박스 좌표 리스트
         bundle.putFloatArray("boxesList", boxesList)
         // 음식+확률 문자열 리스트

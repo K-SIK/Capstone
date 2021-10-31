@@ -44,8 +44,8 @@ class PhotoFragment : Fragment() {
         // Inflate the Sqlitehelper for this fragment
         helper = SqliteHelper(this.requireContext(), "listitem", 1)
         // MainActivity로부터 데이터 수신 (10/23 - 10/24)
-        val imageUri = arguments?.getString("imageUri")
-        val image = loadBitmap(imageUri)
+        val imageByteArray = arguments?.getByteArray("imageByteArray")
+        val image = imageByteArray?.let{BitmapFactory.decodeByteArray(imageByteArray, 0, it.size)}
         val boxesList = arguments?.getFloatArray("boxesList")
         val foodList = arguments?.getStringArray("foodList")
 
@@ -77,11 +77,7 @@ class PhotoFragment : Fragment() {
             // 날짜 생성
             val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
             val datetime = sdf.format(System.currentTimeMillis())
-            // 이미지 ByteArray 생성
-            val image = loadBitmap(imageUri)
-            val stream = ByteArrayOutputStream()
-            image!!.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            val imageByteArray = stream.toByteArray()
+            // 이미지 ByteArray를 String으로 저장
             val imageString = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
             // 아이템 저장
             val listItem = ListItem(null, datetime, imageString, foodListToSave, "")
@@ -101,7 +97,8 @@ class PhotoFragment : Fragment() {
         // 이미지뷰 출력
         val w = image?.width!!
         val h = image?.height!!
-        val tmpBitmap = Bitmap.createBitmap(w, h, image?.config!!)
+        val tmpBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+
         var canvas = Canvas(tmpBitmap)
         canvas.drawBitmap(image, 0f, 0f, null)
         for (i in 0 until foodList?.size!!) {
@@ -158,25 +155,4 @@ class PhotoFragment : Fragment() {
         return canvas!!
     }
 
-    // Uri를 이용해서 미디어스토어에 저장된 이미지를 읽어오는 메서드
-    // 파라미터로 Uri를 받아 결괏괎을 Bitmap으로 반환
-    fun loadBitmap(photoUri: String?): Bitmap?{
-        var image: Bitmap? = null
-        // API 버전이 27 이하이면 MediaStore에 있는 getBitmap 메서드를 사용하고, 27보다 크면 ImageDecoder 사용
-        try{
-            if (photoUri != null) {
-                image = if (Build.VERSION.SDK_INT > 27){
-                    val source: ImageDecoder.Source =
-                        photoUri.let { ImageDecoder.createSource(this.requireActivity().contentResolver, it.toUri()) }
-                    ImageDecoder.decodeBitmap(source)
-                }else{
-                    MediaStore.Images.Media.getBitmap(this.requireActivity().contentResolver, photoUri.toUri())
-                }
-            }
-        }catch(e: IOException){
-            e.printStackTrace()
-        }
-
-        return image
-    }
 }
