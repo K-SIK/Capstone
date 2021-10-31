@@ -8,8 +8,7 @@ import android.text.TextUtils
 
 // PhotoFragment와 ListFragment를 연결하여 ListFragment의 RecyclerView에 출력될 DB
 class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelper(context, name, null, version) {
-    // Q. DB에 리스트 형태의 데이터를 저장할 수 있나??
-    /* params: no: Long, datetime: String, imageUri: String, foodList: Array<String>, diary: String*/
+    /* params: no: Long, datetime: String, imageUri: ByteArray, foodList: Array<String>, diary: String*/
 
     // 데이터베이스 최초 생성 시 호출
     override fun onCreate(db: SQLiteDatabase?) {
@@ -18,7 +17,7 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
                 "(" +
                 "no integer primary key, " + // 순서
                 "datetime text, " +          // 날짜/시간
-                "imageuri text, " +          // 이미지 주소
+                "imagestring text, " +       // 인코딩된 이미지 문자열
                 "foodlist text, " +          // 음식 리스트
                 "diary text" +               // 일기 및 기록장
                 ")"
@@ -34,8 +33,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     // INSERT
     fun insertItem(item: ListItem){
         // 삽입할 데이터 작성
-        val query = "insert into listitem(datetime, imageuri, foodlist, diary) " +
-                "values('${item.datetime}', '${item.imageUri}', '${convertArrayToString(item.foodList, ",")}', '${item.diary}')"
+        val query = "insert into listitem(datetime, imagestring, foodlist, diary) " +
+                "values('${item.datetime}', '${item.imageString}', '${convertArrayToString(item.foodList, ",")}', '${item.diary}')"
 
         val db = writableDatabase
         db.execSQL(query)
@@ -52,11 +51,11 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
             // 반복문을 돌면서 테이블에 정의된 5개의 컬럼에서 값을 꺼낸 후 변수에 저장
             val no: Long = cursor.getLong(cursor.getColumnIndex("no"))
             val datetime: String = cursor.getString(cursor.getColumnIndex("datetime"))
-            val imageUri: String = cursor.getString(cursor.getColumnIndex("imageuri"))
+            val imageString: String? = cursor.getString(cursor.getColumnIndex("imagestring"))
             val foodList: Array<String> = convertStringToArray(cursor.getString(cursor.getColumnIndex("foodlist")),",")
             val diary: String = cursor.getString(cursor.getColumnIndex("diary"))
 
-            list.add(ListItem(no, datetime, imageUri, foodList, diary))
+            list.add(ListItem(no, datetime, imageString!!, foodList, diary))
         }
         cursor.close()
         rd.close()
@@ -67,8 +66,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     fun updateItem(item: ListItem){
         // 수정할 데이터 작성
         val query = "update listitem set datetime='${item.datetime}', " +
-                "imageUri='${item.imageUri}', " +
-                "foodList='${convertArrayToString(item.foodList,",")}', " +
+                "imagestring='${item.imageString}', " +
+                "foodlist='${convertArrayToString(item.foodList,",")}', " +
                 "diary='${item.diary}'" +
                 "where no = ${item.no}"
         val db = writableDatabase
@@ -100,7 +99,6 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
             stringArray[i] = arrayList[i]
         }
         return stringArray
-        // return str.split(delimeter) as Array<String>
     }
 
 }
