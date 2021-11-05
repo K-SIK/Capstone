@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 import java.io.IOException
 import java.text.SimpleDateFormat
