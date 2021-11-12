@@ -4,7 +4,7 @@ from absl import flags
 from absl.flags import FLAGS
 from glob import glob
 
-DATA_PATH = 'C:/Users/wjsdu/OneDrive/Desktop/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/Images'
+DATA_PATH = 'E:/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/Images'
 
 flags.DEFINE_string('path', './', 'directory path to change file formats')
 

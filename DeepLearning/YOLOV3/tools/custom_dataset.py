@@ -8,7 +8,7 @@ import tensorflow as tf
 import lxml.etree
 import tqdm
 
-DATA_PATH = 'C:/Users/wjsdu/OneDrive/Desktop/Capstone_largefiles/DeepLearning/YOLOV3/data'
+DATA_PATH = 'E:/Capstone_largefiles/DeepLearning/YOLOV3/data'
 # 데이터 경로
 # [이미지] 훈련: Training/TRAIN_IMAGE_0XX/디렉터리/사진 파일, 검증: Validation/VAL_IMAGE_0XX/디렉터리/사진 파일
 # [어노테이션] 훈련: Training/TRAIN_LABEL/디렉터리/xml 파일, 검증: Validation/VAL_LABEL/디렉터리/xml 파일
@@ -168,12 +168,15 @@ def main(_argv):
     # 결국 최초 진입 디렉터리인 Images/Annotations 경로만 다르고 그 아래로는 동일 경로(포맷은 당연히 jpg/xml로 다름)
     ANNOTATION_PATH = DATA_PATH + '/images/koreanfood/Annotations'
     path = ANNOTATION_PATH + '/' + FLAGS.split
-    # print(path)
+    # XMLParser
+    parser = lxml.etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+    # 전체 16개 대분류
     for main_dir in tqdm.tqdm(os.listdir(path)):
         path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir
-        for sub_dir in os.listdir(path):
+        # 대분류 안의 중분류/소분류
+        for sub_dir in tqdm.tqdm(os.listdir(path)):
             path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir + '/' + sub_dir
-            # print(path)
+            # 소분류 안의 이미지들
             for xml_file in os.listdir(path):
                 if os.path.splitext(xml_file)[1][1:] != 'xml': continue
                 # print(os.path.splitext(xml_file)[1][1:])
@@ -181,20 +184,26 @@ def main(_argv):
                 annotation_xml = path + '/' + xml_file
                 # print(annotation_xml)
                 # 어노테이션 파일 읽기
-                annotation_xml = lxml.etree.fromstring(open(annotation_xml, encoding='UTF8').read())
+                # parser = lxml.etree.XMLParser(ns_clean=True, recover=True, encoding='utf-8')
+                annotation_xml = lxml.etree.fromstring(open(annotation_xml, 'rb').read(), parser=parser)
+                # annotation_xml = lxml.etree.XML(open(annotation_xml, encoding='UTF8').read())
+                # annotation_xml = lxml.etree.fromstring(open(annotation_xml, 'r', encoding='UTF8').read())
+                # annotation_xml = lxml.etree.fromstring(open(annotation_xml, encoding='UTF8').read())
                 # 읽은 어노테이션 파일을 파싱, 'annotation' key에 해당하는 것만 가져옴
                 annotation = parse_xml(annotation_xml)['annotation']
                 # tf.Example 객체 생성
                 try:
                     tf_example = build_example(annotation, path[len(ANNOTATION_PATH)+1:], class_map)
-                except:
+                    writer.write(tf_example.SerializeToString())
+                except Exception as e:
                     logging.info("Error Occurred: {}".format(path+'/'+xml_file))
+                    logging.info("Error name: {}".format(e))
                     continue
                 # TFRecord 파일로 저장
                 # if not tf_example: 
                 #     logging.info("No such file: {}".format(path+'/'+xml_file))
                 #     continue
-                writer.write(tf_example.SerializeToString())
+                # writer.write(tf_example.SerializeToString())
 
 
         
