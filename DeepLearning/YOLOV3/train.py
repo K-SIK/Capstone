@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import time
+import tqdm
 from tensorflow.keras.callbacks import (
     ReduceLROnPlateau,
     EarlyStopping,
@@ -18,6 +19,11 @@ from yolov3_tf2.models import (
 )
 from yolov3_tf2.utils import freeze_all
 import yolov3_tf2.dataset as dataset
+
+'''
+커스텀 커맨드
+python train.py --dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_train.tfrecord --val_dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_val.tfrecord --weights E:/Capstone_largefiles/DeepLearning/YOLOV3/checkpoints/yolov3.tf --classes E:/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/koreanfood.names --num_classes 400 --mode fit --transfer darknet --epochs 2 --batch_size 32 --weights_num_classes 80
+'''
 
 # 학습 데이터셋 경로
 flags.DEFINE_string('dataset', '', 'path to dataset')
@@ -136,9 +142,11 @@ def main(_argv):
         model, optimizer, loss, anchors, anchor_masks = setup_model()
         
     if FLAGS.tiny:
-        save_path = 'checkpoints/yolov3-tiny_train'
+        # save_path = 'checkpoints/yolov3-tiny_train'
+        save_path = 'E:/Capstone_largefiles/DeepLearning/YOLOV3/checkpoints/koreanfood/yolov3-tiny_train_koreanfood'
     else:
-        save_path = 'checkpoints/yolov3_train'
+        # save_path = 'checkpoints/yolov3_train'
+        save_path = 'E:/Capstone_largefiles/DeepLearning/YOLOV3/checkpoints/koreanfood/yolov3_train_koreanfood'
 
     if FLAGS.dataset:
         train_dataset = dataset.load_tfrecord_dataset(
@@ -170,7 +178,7 @@ def main(_argv):
         avg_val_loss = tf.keras.metrics.Mean('val_loss', dtype=tf.float32)
 
         for epoch in range(1, FLAGS.epochs + 1):
-            for batch, (images, labels) in enumerate(train_dataset):
+            for batch, (images, labels) in tqdm.tqdm(enumerate(train_dataset)):
                 with tf.GradientTape() as tape:
                     outputs = model(images, training=True)
                     regularization_loss = tf.reduce_sum(model.losses)
@@ -188,7 +196,7 @@ def main(_argv):
                     list(map(lambda x: np.sum(x.numpy()), pred_loss))))
                 avg_loss.update_state(total_loss)
 
-            for batch, (images, labels) in enumerate(val_dataset):
+            for batch, (images, labels) in tqdm.tqdm(enumerate(val_dataset)):
                 outputs = model(images)
                 regularization_loss = tf.reduce_sum(model.losses)
                 pred_loss = []
