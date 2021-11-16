@@ -6,6 +6,8 @@ ScriptsOnlyBuild:
     - AirFishLab.ScrollingList.Demo.IntListBox
     Assembly-CSharp.dll:
     - ARPlaceOnPlane
+    - BackActive
+    - ButtonManager
     Bolt.Core.Runtime.dll:
     - Bolt.SceneVariables
     - Bolt.Variables
@@ -97,13 +99,15 @@ ScriptsOnlyBuild:
     - Class: 108
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 1494}
+      Script: {instanceID: 1492}
     - Class: 114
-      Script: {instanceID: 1536}
+      Script: {instanceID: 1534}
     - Class: 114
-      Script: {instanceID: 1646}
+      Script: {instanceID: 1644}
     - Class: 114
-      Script: {instanceID: 2062}
+      Script: {instanceID: 2060}
+    - Class: 114
+      Script: {instanceID: 2272}
     - Class: 114
       Script: {instanceID: 2392}
     - Class: 114
@@ -143,17 +147,19 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 4048}
     - Class: 114
-      Script: {instanceID: 4256}
+      Script: {instanceID: 4090}
     - Class: 114
-      Script: {instanceID: 4406}
+      Script: {instanceID: 4258}
     - Class: 114
-      Script: {instanceID: 4496}
+      Script: {instanceID: 4408}
     - Class: 114
-      Script: {instanceID: 4672}
+      Script: {instanceID: 4498}
     - Class: 114
-      Script: {instanceID: 4776}
+      Script: {instanceID: 4674}
     - Class: 114
       Script: {instanceID: 4778}
+    - Class: 114
+      Script: {instanceID: 4780}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 120
@@ -387,6 +393,12 @@ ScriptsOnlyBuild:
     assemblyName: Bolt.Flow.Editor.dll
     namespaceName: Bolt
     className: MessageListenerEditor
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: ButtonManager
   - hash:
       serializedVersion: 2
       Hash: 5f170942ee57c7a568f5bcfc7521adea
@@ -1031,6 +1043,12 @@ ScriptsOnlyBuild:
     className: SwingArmModel
   - hash:
       serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: BackActive
+  - hash:
+      serializedVersion: 2
       Hash: effe7b5442f9fa0d3aa30810e86e6ef0
     assemblyName: Assembly-CSharp.dll
     namespaceName: Interface.Elements.Scripts
@@ -1506,4 +1524,4 @@ ScriptsOnlyBuild:
   platform: 13
   scenePathNames:
   - Assets/Scenes/SampleScene.unity
-  playerPath: C:/Users/82105/ARCamera/ARCamera.apk
+  playerPath: "C:/Users/82105/Desktop/\uD559\uAD50/3-2/\uCC38\uBE5B\uC124\uACC4/build"
