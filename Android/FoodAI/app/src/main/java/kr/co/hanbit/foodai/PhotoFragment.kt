@@ -56,6 +56,26 @@ class PhotoFragment : Fragment() {
             fragmentManager?.popBackStack()
             Toast.makeText(this.context, "취소되었습니다", Toast.LENGTH_SHORT).show()
         }
+        // 11.12 #1 식단 아이템 삭제 버튼
+        /*binding.btnDeleteItem.setOnClickListener {
+            val fragmentManager = activity?.supportFragmentManager
+            fragmentManager?.beginTransaction()?.remove(this)?.commit()
+            fragmentManager?.popBackStack()
+            Toast.makeText(this.context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+        }*/
+        // 11.12 #2 식단 아이템 추가 버튼
+        binding.btnAdd.setOnClickListener {
+            val foodListToSave = Array(adapter.listData.size + 1){""} // 아이템 개수만큼 공간 할당
+            var i = -1
+            for (item in adapter.listData){
+                i += 1
+                if(item.userInput == null){
+                    continue
+                }
+                foodListToSave[i] = item.userInput!!
+                }
+
+        }
         binding.btnSave.setOnClickListener {
             // TODO: 데이터 저장 확인 팝업창
 

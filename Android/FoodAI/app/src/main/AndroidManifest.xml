@@ -4,11 +4,9 @@
     <!-- 권한 명세 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.hardware.camera2" />
-
 
     <application
         android:allowBackup="true"
@@ -18,10 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodAI">
         <activity
+            android:name=".HomeViewPager"
+            android:exported="false" />
+        <activity
             android:name=".PopupActivity"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-            />
-        <activity android:name=".MainActivity" android:windowSoftInputMode="adjustPan">
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

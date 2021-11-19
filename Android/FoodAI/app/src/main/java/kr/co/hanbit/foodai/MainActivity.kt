@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.viewpager2.widget.ViewPager2
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -277,6 +278,9 @@ class MainActivity : BaseActivity() {
 
         supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment!!).commit()
     }
+
+    // 11.12 삭제 메소드 구현
+
 
     private fun callFoodDetector(bitmap: Bitmap?): Pair<FloatArray, Array<String>>{
         foodDetector = FoodDetector(this)
