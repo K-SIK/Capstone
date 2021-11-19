@@ -279,6 +279,9 @@ class MainActivity : BaseActivity() {
         supportFragmentManager.beginTransaction().replace(R.id.fl_container, photoFragment!!).commit()
     }
 
+    // 11.12 삭제 메소드 구현
+
+
     private fun callFoodDetector(bitmap: Bitmap?): Pair<FloatArray, Array<String>>{
         foodDetector = FoodDetector(this)
         // TODO: 모델 반환값 가공 및 반환

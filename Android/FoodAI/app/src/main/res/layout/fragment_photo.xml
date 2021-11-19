@@ -37,12 +37,12 @@
         android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="84dp"
         android:layout_marginBottom="4dp"
         android:text="저장"
         android:textSize="14sp"
-        app:backgroundTint="@android:color/holo_green_light"
+        app:backgroundTint="#7DB57F"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
@@ -51,9 +51,20 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:text="취소"
-        app:backgroundTint="@android:color/holo_green_light"
+        app:backgroundTint="#7DB57F"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btnSave" />
+
+    <Button
+        android:id="@+id/btnAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="추가"
+        app:backgroundTint="#7DB57F"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnSave"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
