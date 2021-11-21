@@ -22,7 +22,8 @@ import yolov3_tf2.dataset as dataset
 
 '''
 커스텀 커맨드
-python train.py --dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_train.tfrecord --val_dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_val.tfrecord --weights E:/Capstone_largefiles/DeepLearning/YOLOV3/checkpoints/yolov3.tf --classes E:/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/koreanfood.names --num_classes 400 --mode fit --transfer darknet --epochs 2 --batch_size 32 --weights_num_classes 80
+전이학습: python train.py --dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_train.tfrecord --val_dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_val.tfrecord --weights E:/Capstone_largefiles/DeepLearning/YOLOV3/checkpoints/yolov3.tf --classes E:/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/koreanfood.names --num_classes 400 --mode fit --transfer darknet --epochs 2 --batch_size 8 --weights_num_classes 80
+일반학습: python train.py --dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_train.tfrecord --val_dataset E:/Capstone_largefiles/DeepLearning/YOLOV3/data/koreanfood_val.tfrecord --classes E:/Capstone_largefiles/DeepLearning/YOLOV3/data/images/koreanfood/koreanfood.names --num_classes 400 --mode fit --transfer none --epochs 2 --batch_size 4
 '''
 
 # 학습 데이터셋 경로

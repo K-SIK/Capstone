@@ -25,7 +25,7 @@ flags.DEFINE_string('output', './output.jpg', 'path to output image')
 
 # TFRecord에서 로드된 이미지 데이터들 중 하나의 랜덤한 이미지를 출력
 def main(_argv):
-    class_names = [c.strip() for c in open(FLAGS.classes).readlines()]
+    class_names = [c.strip() for c in open(FLAGS.classes, encoding='UTF8').readlines()]
     logging.info('classes loaded')
 
     dataset = load_tfrecord_dataset(FLAGS.dataset, FLAGS.classes, FLAGS.size)
@@ -49,7 +49,7 @@ def main(_argv):
 
         logging.info('labels:')
         for i in range(nums[0]):
-            logging.info('\t{}, {}, {}'.format(class_names[int(classes[0][i])],
+            logging.info('\t{}: {}, {}, {}'.format(int(classes[0][i]), class_names[int(classes[0][i])],
                                                np.array(scores[0][i]),
                                                np.array(boxes[0][i])))
 
