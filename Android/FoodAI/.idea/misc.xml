@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.159375" />
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/drawable/ic_account.xml" value="0.159375" />
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/drawable/ic_baseline_adb_24.xml" value="0.159375" />
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/drawable/ic_launcher_background.xml" value="0.159375" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/activity_home_view_pager.xml" value="0.1" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/activity_popup.xml" value="0.3333333333333333" />
@@ -13,8 +17,10 @@
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/fragment_home4.xml" value="0.1" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/fragment_list.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/fragment_photo.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/fragment_recommendation.xml" value="0.14322916666666666" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/item_viewpager.xml" value="0.1" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/listitem_recycler.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/photoitem_add.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/photoitem_mj.xml" value="0.15052083333333333" />
         <entry key="..\:/Users/MJ/KSIK/Capstone/Android/FoodAI/app/src/main/res/layout/photoitem_recycler.xml" value="0.3333333333333333" />
       </map>
