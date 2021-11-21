@@ -176,7 +176,7 @@ def main(_argv):
         # 대분류 안의 중분류/소분류
         for sub_dir in tqdm.tqdm(os.listdir(path)):
             path = ANNOTATION_PATH + '/' + FLAGS.split + '/' + main_dir + '/' + sub_dir
-            # 소분류 안의 이미지들
+            # 소분류 안의 xml 파일들
             for xml_file in os.listdir(path):
                 if os.path.splitext(xml_file)[1][1:] != 'xml': continue
                 # print(os.path.splitext(xml_file)[1][1:])

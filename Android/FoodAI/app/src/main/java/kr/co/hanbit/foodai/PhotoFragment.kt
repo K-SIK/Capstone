@@ -48,7 +48,6 @@ class PhotoFragment : Fragment() {
         val image = imageByteArray?.let{BitmapFactory.decodeByteArray(imageByteArray, 0, it.size)}
         val boxesList = arguments?.getFloatArray("boxesList")
         val foodList = arguments?.getStringArray("foodList")
-
         // 버튼 리스너
         binding.btnCancel.setOnClickListener {
             val fragmentManager = activity?.supportFragmentManager
@@ -65,20 +64,12 @@ class PhotoFragment : Fragment() {
         }*/
         // 11.12 #2 식단 아이템 추가 버튼
         binding.btnAdd.setOnClickListener {
-            val foodListToSave = Array(adapter.listData.size + 1){""} // 아이템 개수만큼 공간 할당
-            var i = -1
-            for (item in adapter.listData){
-                i += 1
-                if(item.userInput == null){
-                    continue
-                }
-                foodListToSave[i] = item.userInput!!
-                }
-
+            adapter.listData.add(PhotoItem(adapter.listData.size+1, "직접 입력해주세요!", null))
+            adapter.notifyDataSetChanged()
         }
         binding.btnSave.setOnClickListener {
             // TODO: 데이터 저장 확인 팝업창
-
+            // TODO: 저장 시 에디트 텍스트에 값이 입력되어 있으면 아이템 값 업데이트
 
             // 리사이클러 뷰의 아이템들을 DB에 저장
             // 음식 리스트 생성
@@ -86,11 +77,12 @@ class PhotoFragment : Fragment() {
             var i = -1
             for (item in adapter.listData){
                 i += 1
-                if(item.userInput == null){ // save detectedFood
+
+                if(item.userInput?.isEmpty() == true){ // save detectedFood
                     val (food, probability) = item.detectedFood.split("\t")
                     foodListToSave[i] = food
                 }else{ // save userInput
-                    foodListToSave[i] = item.userInput!!
+                    foodListToSave[i] = item.userInput!!.toString()
                 }
                 Log.i("foodListToSave", foodListToSave[i])
             }
