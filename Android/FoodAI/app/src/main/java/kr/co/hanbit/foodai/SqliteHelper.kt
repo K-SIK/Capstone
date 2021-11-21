@@ -19,7 +19,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
                 "datetime text, " +          // 날짜/시간
                 "imagestring text, " +       // 인코딩된 이미지 문자열
                 "foodlist text, " +          // 음식 리스트
-                "diary text" +               // 일기 및 기록장
+                "diary text, " +             // 일기 및 기록장
+                "favorite text" +            // 즐겨찾기
                 ")"
         // DB의 execSQL 메서드에 전달하여 쿼리 실행
         db?.execSQL(create)
@@ -33,8 +34,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     // INSERT
     fun insertItem(item: ListItem){
         // 삽입할 데이터 작성
-        val query = "insert into listitem(datetime, imagestring, foodlist, diary) " +
-                "values('${item.datetime}', '${item.imageString}', '${convertArrayToString(item.foodList, ",")}', '${item.diary}')"
+        val query = "insert into listitem(datetime, imagestring, foodlist, diary, favorite) " +
+                "values('${item.datetime}', '${item.imageString}', '${convertArrayToString(item.foodList, ",")}', '${item.diary}', '${item.favorite}')"
 
         val db = writableDatabase
         db.execSQL(query)
@@ -92,7 +93,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
         val query = "update listitem set datetime='${item.datetime}', " +
                 "imagestring='${item.imageString}', " +
                 "foodlist='${convertArrayToString(item.foodList,",")}', " +
-                "diary='${item.diary}'" +
+                "diary='${item.diary}', " +
+                "favorite='${item.favorite}'" +
                 "where no = ${item.no}"
         val db = writableDatabase
         db.execSQL(query)

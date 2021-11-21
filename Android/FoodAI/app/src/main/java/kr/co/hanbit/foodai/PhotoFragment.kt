@@ -78,7 +78,7 @@ class PhotoFragment : Fragment() {
             for (item in adapter.listData){
                 i += 1
 
-                if(item.userInput?.isEmpty() == true){ // save detectedFood
+                if(item.userInput == null){ // save detectedFood
                     val (food, probability) = item.detectedFood.split("\t")
                     foodListToSave[i] = food
                 }else{ // save userInput
