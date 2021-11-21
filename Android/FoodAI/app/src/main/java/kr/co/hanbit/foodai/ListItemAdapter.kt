@@ -51,7 +51,7 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
                 listData.clear()
                 listData.addAll(helper!!.selectAllItem())
                 notifyDataSetChanged()
-                Toast.makeText(context, "저장되었습니다", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "아이템이 저장되었습니다.", Toast.LENGTH_SHORT).show()
             }
             // 삭제 버튼
             binding.btnDeleteListItem.setOnClickListener {
@@ -63,7 +63,7 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
                 listData.clear()
                 listData.addAll(helper!!.selectAllItem())
                 notifyDataSetChanged()
-                Toast.makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "아이템이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
             }
             // 즐겨찾기 버튼
             binding.btnFavorite.setOnClickListener {

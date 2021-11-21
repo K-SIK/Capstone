@@ -20,7 +20,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_margin="4dp"
-        android:layout_weight="9">
+        android:layout_weight="6">
 
         <RadioButton
             android:id="@+id/radioDetectedFood"
@@ -50,24 +50,48 @@
             android:inputType="textPersonName"
             android:textSize="14sp"
             android:visibility="visible"
-            tools:ignore="TouchTargetSizeCheck"/>
+            tools:ignore="TouchTargetSizeCheck" />
 
     </RadioGroup>
 
-    <Button
-        android:id="@+id/btnDeleteItem"
-        style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="31dp"
-        android:layout_height="114dp"
-        android:layout_margin="1dp"
-        android:layout_marginTop="2dp"
-        android:layout_weight="1"
-        android:background="#FFFFFF"
-        android:text="삭제"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="#000000"
-        app:backgroundTint="#7DB57F"
-        app:iconTint="#040000"
-        app:rippleColor="#000000" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.5"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btnModifyItem"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            android:text="입력완료"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            app:backgroundTint="#7DB57F"
+            app:iconTint="#040000"
+            app:rippleColor="#000000" />
+
+        <Button
+            android:id="@+id/btnDeleteItem"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            android:text="삭제하기"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            app:backgroundTint="#7DB57F"
+            app:iconTint="#040000"
+            app:rippleColor="#000000" />
+    </LinearLayout>
 
 </LinearLayout>
