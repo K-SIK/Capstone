@@ -40,8 +40,8 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
         db.execSQL(query)
         db.close()
     }
-    // SELECT
-    fun selectItem(): MutableList<ListItem>{
+    // SELECT(all)
+    fun selectAllItem(): MutableList<ListItem>{
         val list = mutableListOf<ListItem>()
 
         val select = "select * from listitem" // 전체 선택
@@ -54,8 +54,32 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
             val imageString: String? = cursor.getString(cursor.getColumnIndex("imagestring"))
             val foodList: Array<String> = convertStringToArray(cursor.getString(cursor.getColumnIndex("foodlist")),",")
             val diary: String = cursor.getString(cursor.getColumnIndex("diary"))
+            val favorite: String = cursor.getString(cursor.getColumnIndex("favorite"))
 
-            list.add(ListItem(no, datetime, imageString!!, foodList, diary))
+            list.add(ListItem(no, datetime, imageString!!, foodList, diary, favorite))
+        }
+        cursor.close()
+        rd.close()
+
+        return list
+    }
+    // SELECT(favorite)
+    fun selectFavoriteItem(): MutableList<ListItem>{
+        val list = mutableListOf<ListItem>()
+
+        val select = "select * from listitem where favorite='true'" // 전체 선택
+        val rd = readableDatabase
+        val cursor = rd.rawQuery(select, null)
+        while (cursor.moveToNext()){
+            // 반복문을 돌면서 테이블에 정의된 5개의 컬럼에서 값을 꺼낸 후 변수에 저장
+            val no: Long = cursor.getLong(cursor.getColumnIndex("no"))
+            val datetime: String = cursor.getString(cursor.getColumnIndex("datetime"))
+            val imageString: String? = cursor.getString(cursor.getColumnIndex("imagestring"))
+            val foodList: Array<String> = convertStringToArray(cursor.getString(cursor.getColumnIndex("foodlist")),",")
+            val diary: String = cursor.getString(cursor.getColumnIndex("diary"))
+            val favorite: String = cursor.getString(cursor.getColumnIndex("favorite"))
+
+            list.add(ListItem(no, datetime, imageString!!, foodList, diary, favorite))
         }
         cursor.close()
         rd.close()

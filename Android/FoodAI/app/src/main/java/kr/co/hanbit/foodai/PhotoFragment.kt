@@ -92,7 +92,7 @@ class PhotoFragment : Fragment() {
             // 이미지 ByteArray를 String으로 저장
             val imageString = Base64.encodeToString(imageByteArray, Base64.DEFAULT)
             // 아이템 저장
-            val listItem = ListItem(null, datetime, imageString, foodListToSave, "")
+            val listItem = ListItem(null, datetime, imageString, foodListToSave, "", "false")
             helper.insertItem(listItem)
             Log.d("PhotoFragment", "Item inserted")
 

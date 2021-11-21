@@ -34,16 +34,22 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
             binding.textDatetime.text = listItem.datetime
             binding.textFoodList.text = helper!!.convertArrayToString(listItem.foodList, ",")
             binding.editTextDiary.setText(listItem.diary)
+            if(listItem.favorite == "true"){
+                binding.btnFavorite.setImageResource(android.R.drawable.btn_star_big_on)
+            }else{
+                binding.btnFavorite.setImageResource(android.R.drawable.btn_star_big_off)
+            }
             // 저장 버튼
             binding.btnSaveListItem.setOnClickListener {
                 // TODO: 저장하시겠습니까? 팝업창
 
                 // 아이템 수정 (한줄 일기 업데이트)
                 // listItem.diary = binding.editTextDiary.text.toString()
-                helper!!.updateItem(ListItem(listItem.no, listItem.datetime, listItem.imageString, listItem.foodList, binding.editTextDiary.text.toString()))
+                helper!!.updateItem(ListItem(listItem.no, listItem.datetime, listItem.imageString,
+                    listItem.foodList, binding.editTextDiary.text.toString(), listItem.favorite))
                 // 리사이클러뷰에 업데이트
                 listData.clear()
-                listData.addAll(helper!!.selectItem())
+                listData.addAll(helper!!.selectAllItem())
                 notifyDataSetChanged()
                 Toast.makeText(context, "저장되었습니다", Toast.LENGTH_SHORT).show()
             }
@@ -55,9 +61,24 @@ class ListItemAdapter: RecyclerView.Adapter<ListItemAdapter.ListItemHolder>() {
                 helper!!.deleteItem(listItem)
                 // 리사이클러뷰에 업데이트
                 listData.clear()
-                listData.addAll(helper!!.selectItem())
+                listData.addAll(helper!!.selectAllItem())
                 notifyDataSetChanged()
                 Toast.makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+            }
+            // 즐겨찾기 버튼
+            binding.btnFavorite.setOnClickListener {
+                if(listItem.favorite == "true"){
+                    binding.btnFavorite.setImageResource(android.R.drawable.btn_star_big_off)
+                    listItem.favorite = "false"
+                    Toast.makeText(binding.root.context, "즐겨찾기 해제되었습니다.", Toast.LENGTH_SHORT).show()
+                }else{
+                    binding.btnFavorite.setImageResource(android.R.drawable.btn_star_big_on)
+                    listItem.favorite = "true"
+                    Toast.makeText(binding.root.context, "즐겨찾기 등록되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+                // 데이터 변경 알리기
+                helper?.updateItem(listItem)
+                notifyDataSetChanged()
             }
 
         }
