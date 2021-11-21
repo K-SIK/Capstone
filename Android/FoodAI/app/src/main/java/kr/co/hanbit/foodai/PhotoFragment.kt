@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import kr.co.hanbit.foodai.databinding.FragmentPhotoBinding
 import java.io.ByteArrayOutputStream
@@ -55,13 +56,7 @@ class PhotoFragment : Fragment() {
             fragmentManager?.popBackStack()
             Toast.makeText(this.context, "취소되었습니다", Toast.LENGTH_SHORT).show()
         }
-        // 11.12 #1 식단 아이템 삭제 버튼
-        /*binding.btnDeleteItem.setOnClickListener {
-            val fragmentManager = activity?.supportFragmentManager
-            fragmentManager?.beginTransaction()?.remove(this)?.commit()
-            fragmentManager?.popBackStack()
-            Toast.makeText(this.context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
-        }*/
+
         // 11.12 #2 식단 아이템 추가 버튼
         binding.btnAdd.setOnClickListener {
             adapter.listData.add(PhotoItem(adapter.listData.size+1, "직접 입력해주세요!", null))
@@ -82,7 +77,7 @@ class PhotoFragment : Fragment() {
                     val (food, probability) = item.detectedFood.split("\t")
                     foodListToSave[i] = food
                 }else{ // save userInput
-                    foodListToSave[i] = item.userInput!!.toString()
+                    foodListToSave[i] = item.userInput!!
                 }
                 Log.i("foodListToSave", foodListToSave[i])
             }
@@ -127,12 +122,17 @@ class PhotoFragment : Fragment() {
         val data = loadData(foodList)
         Log.d("PhotoFragment", "Data loaded")
 
-        adapter = PhotoItemAdapter()
+        adapter = PhotoItemAdapter(onClickDeleteBtn = {deleteItem(it)})
         adapter.listData = data
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
 
         return binding.root
+    }
+
+    fun deleteItem(item: PhotoItem){
+        adapter.listData.remove(item)
+        adapter.notifyDataSetChanged()
     }
 
     // 목록의 아이템 클래스의 리스트를 반환하는 함수

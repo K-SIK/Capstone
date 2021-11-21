@@ -2,10 +2,14 @@ package kr.co.hanbit.foodai
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import kr.co.hanbit.foodai.databinding.PhotoitemRecyclerBinding
+import kotlin.coroutines.coroutineContext
 
-class PhotoItemAdapter: RecyclerView.Adapter<PhotoItemAdapter.PhotoItemHolder>() {
+class PhotoItemAdapter(
+    val onClickDeleteBtn: (item: PhotoItem) -> Unit
+): RecyclerView.Adapter<PhotoItemAdapter.PhotoItemHolder>() {
     // 존재하는 데이터 리스트
     var listData = mutableListOf<PhotoItem>()
     // SQliteHelper 프로퍼티
@@ -51,6 +55,16 @@ class PhotoItemAdapter: RecyclerView.Adapter<PhotoItemAdapter.PhotoItemHolder>()
     override fun onBindViewHolder(holder: PhotoItemHolder, position: Int) {
         val photoItem = listData.get(position)
         holder.setPhotoItem(photoItem)
+        // 아이템 수정 리스너
+        holder.binding.btnModifyItem.setOnClickListener {
+            photoItem.userInput = holder.binding.editUserInput.text.toString()
+            Toast.makeText(holder.itemView.context, "아이템이 수정되었습니다.", Toast.LENGTH_SHORT).show()
+        }
+        // 아이템 삭제 리스너
+        holder.binding.btnDeleteItem.setOnClickListener {
+            onClickDeleteBtn.invoke(photoItem)
+            Toast.makeText(holder.itemView.context, "아이템이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+        }
     }
     // 목록에 보여줄 아이템 개수
     override fun getItemCount(): Int {
