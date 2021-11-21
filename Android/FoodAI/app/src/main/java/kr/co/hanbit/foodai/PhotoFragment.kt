@@ -114,7 +114,7 @@ class PhotoFragment : Fragment() {
             val xmax = boxesList?.get(4 * i + 2)!!
             val ymax = boxesList?.get(4 * i + 3)!!
 
-            canvas = drawOnCanvas(canvas,w*xmin, h*ymin, w*xmax, h*ymax)
+            canvas = drawOnCanvas(canvas,w*xmin, h*ymin, w*xmax, h*ymax, foodList[i])
         }
         binding.imageViewPhoto.setImageDrawable(BitmapDrawable(resources, tmpBitmap))
 
@@ -155,14 +155,19 @@ class PhotoFragment : Fragment() {
         return data
     }
 
-    private fun drawOnCanvas(canvas: Canvas?, xmin: Float, ymin: Float, xmax: Float, ymax: Float): Canvas{
-        val paint = Paint()
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 3f
-        paint.color = Color.GREEN
+    private fun drawOnCanvas(canvas: Canvas?, xmin: Float, ymin: Float, xmax: Float, ymax: Float, info: String): Canvas{
+        // 탐지 박스 그리기
+        val paintRect = Paint()
+        paintRect.style = Paint.Style.STROKE
+        paintRect.strokeWidth = 3f
+        paintRect.color = Color.GREEN
         val rect = RectF(xmin, ymin, xmax, ymax)
-
-        canvas?.drawRect(rect, paint)
+        canvas?.drawRect(rect, paintRect)
+        // 탐지 정보 그리기
+        val paintText = Paint()
+        paintText.color = Color.BLACK
+        paintText.textSize = 25f
+        canvas?.drawText(info, xmin, ymin, paintText)
 
         return canvas!!
     }
