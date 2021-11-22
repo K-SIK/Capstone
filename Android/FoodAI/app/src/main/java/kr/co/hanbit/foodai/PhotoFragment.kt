@@ -159,14 +159,14 @@ class PhotoFragment : Fragment() {
         // 탐지 박스 그리기
         val paintRect = Paint()
         paintRect.style = Paint.Style.STROKE
-        paintRect.strokeWidth = 3f
+        paintRect.strokeWidth = 5f
         paintRect.color = Color.GREEN
         val rect = RectF(xmin, ymin, xmax, ymax)
         canvas?.drawRect(rect, paintRect)
         // 탐지 정보 그리기
         val paintText = Paint()
-        paintText.color = Color.BLACK
-        paintText.textSize = 25f
+        paintText.color = Color.GREEN
+        paintText.textSize = 50f
         canvas?.drawText(info, xmin, ymin, paintText)
 
         return canvas!!
