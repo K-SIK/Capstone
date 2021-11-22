@@ -27,6 +27,7 @@ class FoodDetector(context: Context) {
         // 2-1. 모델 로드: tflite 모델을 assets 디렉터리에 추가
         // 2-2. 모델 로드: 모델 파일명을 상수로 선언
         private const val MODEL_NAME = "yolov3-tiny.tflite"
+        // const val MODEL_NAME = "yolov3_dynamic_range.tflite"
         // 5-1. 추론 결과 해석: 분류 클래스 라벨을 포함하는 txt 파일을 assets 디렉터리에 추가
         // 5-2. 추론 결과 해석: 라벨 파일명을 상수로 선언
         private const val LABEL_FILE = "coco.names"
