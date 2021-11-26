@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.viewpager2.widget.ViewPager2
 import kr.co.hanbit.foodai.databinding.ActivityMainBinding
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -19,13 +18,20 @@ import java.io.ByteArrayOutputStream
 
 class MainActivity : BaseActivity() {
 
-    // 권한 관련 상수 선언
     companion object{
+        // 권한 관련 상수 선언
         const val PERM_STORAGE = 99 // 외부 저장소 쓰기 권한 요청
         const val PERM_CAMERA = 100 // 카메라 권한 요청
         const val REQ_CAMERA = 101  // 카메라 호출
         const val REQ_STORAGE = 102 // 갤러리 호출
         const val POPUP_ACTIVITY = 103 // 팝업 액티비티 호출
+
+        // 이미지 Uri
+        const val GEUPSIK = "content://com.android.providers.media.documents/document/image%3A32"
+        const val HAMBURGER_AND_FRIES = "content://com.android.providers.media.documents/document/image%3A34"
+        const val STEAK_AND_PASTA = "content://com.android.providers.media.documents/document/image%3A36"
+        const val PIZZA = "content://com.android.providers.media.documents/document/image%3A38"
+
     }
 
     // 전역 프로퍼티
@@ -221,7 +227,7 @@ class MainActivity : BaseActivity() {
                         val capturedImage = loadBitmap(uri)
                         // 비트맵을 모델에 전달하여 추론 수행
                         val (boxesList, foodList) = callFoodDetector(capturedImage)
-                        setPhotoFragment(Triple(capturedImage, boxesList, foodList))
+                        setPhotoFragment(Triple(Pair(photoUri, capturedImage), boxesList, foodList))
                         photoUri = null
                     }
 
@@ -229,10 +235,19 @@ class MainActivity : BaseActivity() {
                 REQ_STORAGE -> {
                     Toast.makeText(baseContext, "사진 선택 완료!", Toast.LENGTH_SHORT).show()
                     val selectedImageUri: Uri = data?.data as Uri
+                    Log.d("selectedImageUri", "$selectedImageUri")
+                    /*
+                    급식 이미지: content://com.android.providers.media.documents/document/image%3A32
+                    햄버거/감자튀김 이미지: content://com.android.providers.media.documents/document/image%3A34
+                    스테이크/파스타 이미지: content://com.android.providers.media.documents/document/image%3A36
+                    피자 이미지: content://com.android.providers.media.documents/document/image%3A38
+
+
+                     */
                     val selectedImage = loadBitmap(selectedImageUri)
                     // 비트맵을 모델에 전달하여 추론 수행
                     val (boxesList, foodList) = callFoodDetector(selectedImage)
-                    setPhotoFragment(Triple(selectedImage, boxesList, foodList))
+                    setPhotoFragment(Triple(Pair(selectedImageUri, selectedImage), boxesList, foodList))
 
                 }
 
@@ -255,14 +270,17 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setPhotoFragment(data: Triple<Bitmap?, FloatArray?, Array<String>>){
+    private fun setPhotoFragment(data: Triple<Pair<Uri?, Bitmap?>, FloatArray, Array<String>>){
         photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
         Toast.makeText(this, "잠시만 기다려주세요...", Toast.LENGTH_LONG).show()
 
         // 번들을 생성하고 전달할 값을 담는다.
         var bundle = Bundle()
-        val (image, boxesList, foodList) = data
+        val (imageInfo, boxesList, foodList) = data
+        val (imageUri, image) = imageInfo
+        // 이미지 Uri
+        bundle.putString("imageUri", imageUri.toString())
         // 이미지
         val stream = ByteArrayOutputStream()
         image?.compress(Bitmap.CompressFormat.PNG, 100, stream)

@@ -68,7 +68,7 @@ class SqliteHelper(context: Context, name: String, version: Int):SQLiteOpenHelpe
     fun selectFavoriteItem(): MutableList<ListItem>{
         val list = mutableListOf<ListItem>()
 
-        val select = "select * from listitem where favorite='true'" // 전체 선택
+        val select = "select * from listitem where favorite=\"true\"" // 전체 선택
         val rd = readableDatabase
         val cursor = rd.rawQuery(select, null)
         while (cursor.moveToNext()){
