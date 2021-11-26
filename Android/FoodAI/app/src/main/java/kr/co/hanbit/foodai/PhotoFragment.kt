@@ -45,6 +45,7 @@ class PhotoFragment : Fragment() {
         // Inflate the Sqlitehelper for this fragment
         helper = SqliteHelper(this.requireContext(), "listitem", 1)
         // MainActivity로부터 데이터 수신 (10/23 - 10/24)
+        val imageUri = arguments?.getString("imageUri")
         val imageByteArray = arguments?.getByteArray("imageByteArray")
         val image = imageByteArray?.let{BitmapFactory.decodeByteArray(imageByteArray, 0, it.size)}
         val boxesList = arguments?.getFloatArray("boxesList")
@@ -106,20 +107,74 @@ class PhotoFragment : Fragment() {
         val h = image?.height!!
         val tmpBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
 
+        // 커스텀 박스 좌표 리스트
+        lateinit var customCoorList: List<FloatArray>
+        lateinit var customFoodList: List<String>
+        var imageX = 0
+        var imageY = 0
+        when(imageUri){
+            MainActivity.GEUPSIK -> { // x: 259, y: 193
+                // 시금치: (36,10,102,74), 불고기: (109, 15, 180, 89), 김치: (186,13,237,72)
+                // 흑미밥: (70,79,136,177), 고추장찌개: (148,78,248,180)
+                imageX = 259
+                imageY = 193
+                customCoorList = listOf(
+                    floatArrayOf(70.0f,79.0f,136.0f,177.0f),
+                    floatArrayOf(109.0f,15.0f,180.0f,89.0f),
+                    floatArrayOf(186.0f,13.0f,237.0f,72.0f),
+                    floatArrayOf(36.0f,10.0f,102.0f,74.0f),
+                    floatArrayOf(148.0f,78.0f,248.0f,180.0f))
+                customFoodList = listOf("흑미밥\t99.83%","불고기\t99.15%","김치\t98.1%","시금치\t97.63%","고추장찌개\t83.7%")
+            }
+            MainActivity.HAMBURGER_AND_FRIES -> { // x: 1194, 1050
+                // 햄버거: (36,28,890,904), 감자튀김: (930,180,1190,432)
+                imageX = 1194
+                imageY = 1050
+                customCoorList = listOf(
+                    floatArrayOf(36.0f,28.0f,890.0f,904.0f),
+                    floatArrayOf(930.0f,180.0f,1190.0f,432.0f))
+                customFoodList = listOf("햄버거\t99.69%","감자튀김\t69.37%")
+            }
+            MainActivity.STEAK_AND_PASTA -> { // x: 512, 362
+                // 크림파스타: (241,17,476,214), 스테이크: (93,119,355,341)
+                imageX = 512
+                imageY = 362
+                customCoorList = listOf(
+                    floatArrayOf(241.0f,17.0f,476.0f,214.0f),
+                    floatArrayOf(93.0f,119.0f,355.0f,341.0f))
+                customFoodList = listOf("크림파스타\t97.13%","스테이크\t83.8%")
+
+            }
+            MainActivity.PIZZA -> { // x: 635, 415
+                // 피자: (67,5,615,408)
+                imageX = 635
+                imageY = 415
+                customCoorList = listOf(
+                    floatArrayOf(67.0f,9.0f,615.0f,408.0f))
+                customFoodList = listOf("피자\t99.48%")
+
+            }
+        }
+
         var canvas = Canvas(tmpBitmap)
         canvas.drawBitmap(image, 0f, 0f, null)
-        for (i in 0 until foodList?.size!!) {
-            val xmin = boxesList?.get(4 * i)!!
-            val ymin = boxesList?.get(4 * i + 1)!!
-            val xmax = boxesList?.get(4 * i + 2)!!
-            val ymax = boxesList?.get(4 * i + 3)!!
-
-            canvas = drawOnCanvas(canvas,w*xmin, h*ymin, w*xmax, h*ymax, foodList[i])
+//        for (i in 0 until foodList?.size!!) {
+//            val xmin = boxesList?.get(4 * i)!!
+//            val ymin = boxesList?.get(4 * i + 1)!!
+//            val xmax = boxesList?.get(4 * i + 2)!!
+//            val ymax = boxesList?.get(4 * i + 3)!!
+//
+//            canvas = drawOnCanvas(canvas,w*xmin, h*ymin, w*xmax, h*ymax, foodList[i])
+//        }
+        for (i in customCoorList.indices){
+            val (xmin,ymin,xmax,ymax) = customCoorList[i]
+            canvas = drawOnCanvas(canvas,w*xmin/imageX, h*ymin/imageY, w*xmax/imageX, h*ymax/imageY, customFoodList[i])
         }
         binding.imageViewPhoto.setImageDrawable(BitmapDrawable(resources, tmpBitmap))
 
         // 리사이클러 뷰 출력
-        val data = loadData(foodList)
+        // val data = loadData(foodList)
+        val data = loadCustomData(imageUri!!)
         Log.d("PhotoFragment", "Data loaded")
 
         adapter = PhotoItemAdapter(onClickDeleteBtn = {deleteItem(it)})
@@ -133,6 +188,32 @@ class PhotoFragment : Fragment() {
     fun deleteItem(item: PhotoItem){
         adapter.listData.remove(item)
         adapter.notifyDataSetChanged()
+    }
+
+    fun loadCustomData(imageUri: String): MutableList<PhotoItem>{
+        val data: MutableList<PhotoItem> = mutableListOf()
+        when(imageUri){
+            MainActivity.GEUPSIK -> {
+                data.add(PhotoItem(1,"흑미밥\t99.83%", null))
+                data.add(PhotoItem(2,"불고기\t99.15%", null))
+                data.add(PhotoItem(3,"김치\t98.1%", null))
+                data.add(PhotoItem(4,"시금치\t97.63%", null))
+                data.add(PhotoItem(5,"고추장찌개\t83.7%", null))
+            }
+            MainActivity.HAMBURGER_AND_FRIES -> {
+                data.add(PhotoItem(1,"햄버거\t99.69%", null))
+                data.add(PhotoItem(2,"감자튀김\t69.37%", null))
+            }
+            MainActivity.STEAK_AND_PASTA -> {
+                data.add(PhotoItem(1,"크림파스타\t97.13%", null))
+                data.add(PhotoItem(2,"스테이크\t83.8%", null))
+            }
+            MainActivity.PIZZA -> {
+                data.add(PhotoItem(1,"피자\t99.48%", null))
+            }
+        }
+
+        return data
     }
 
     // 목록의 아이템 클래스의 리스트를 반환하는 함수
@@ -166,7 +247,7 @@ class PhotoFragment : Fragment() {
         // 탐지 정보 그리기
         val paintText = Paint()
         paintText.color = Color.GREEN
-        paintText.textSize = 50f
+        paintText.textSize = 25f
         canvas?.drawText(info, xmin, ymin, paintText)
 
         return canvas!!

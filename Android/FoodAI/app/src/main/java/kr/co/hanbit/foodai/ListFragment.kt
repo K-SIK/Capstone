@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import kr.co.hanbit.foodai.databinding.FragmentListBinding
@@ -51,6 +52,8 @@ class ListFragment : Fragment() {
         adapter = ListItemAdapter()
         adapter.helper = helper
         adapter.context = this.context
+        val dividerItemDecoration = DividerItemDecoration(binding.recyclerView.context, LinearLayoutManager(this.context).orientation)
+        binding.recyclerView.addItemDecoration(dividerItemDecoration)
 
         // 초기 화면은 전체 식단 출력
         var data: MutableList<ListItem>
@@ -106,36 +109,6 @@ class ListFragment : Fragment() {
         adapter.notifyDataSetChanged()
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this.context)
-    }
-
-//    // DB에 있는 아이템들을 가져오는 메서드
-//    fun loadData(): MutableList<ListItem>{
-//        val data: MutableList<ListItem> = mutableListOf()
-//
-//
-//
-//        return data
-//    }
-
-
-    // Uri를 이용해서 미디어스토어에 저장된 이미지를 읽어오는 메서드
-    // 파라미터로 Uri를 받아 결괏괎을 Bitmap으로 반환
-    fun loadBitmap(photoUri: Uri): Bitmap?{
-        var image: Bitmap? = null
-        // API 버전이 27 이하이면 MediaStore에 있는 getBitmap 메서드를 사용하고, 27보다 크면 ImageDecoder 사용
-        try{
-            image = if (Build.VERSION.SDK_INT > 27){
-                val source: ImageDecoder.Source =
-                    ImageDecoder.createSource(this.requireActivity().contentResolver, photoUri)
-                ImageDecoder.decodeBitmap(source)
-            }else{
-                MediaStore.Images.Media.getBitmap(this.requireActivity().contentResolver, photoUri)
-            }
-        }catch(e: IOException){
-            e.printStackTrace()
-        }
-
-        return image
     }
 
 }
