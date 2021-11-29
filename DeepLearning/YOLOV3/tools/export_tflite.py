@@ -69,6 +69,7 @@ def main(_argv):
     open(FLAGS.output, 'wb').write(tflite_model)
     logging.info("model saved to: {}".format(FLAGS.output))
     # ====================================================================================================
+    
     '''
     # tflite 테스트
     interpreter = tf.lite.Interpreter(model_path=FLAGS.output)

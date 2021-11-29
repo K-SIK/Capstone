@@ -80,10 +80,7 @@ class FoodDetector(context: Context) {
     // 3-3. 입력 이미지 전처리: 메서드 정의
     // 모델의 입력 형상과 데이터 타입을 프로퍼티에 저장
     private fun initModelShape(){
-        // ========================================================================================
-        // val inputTensor = interpreter.getInputTensor(0)
         val inputTensor = model.getInputTensor(0)
-        // ========================================================================================
         val shape = inputTensor.shape()
         modelInputChannel = shape[0]
         modelInputWidth = shape[1]
@@ -91,14 +88,11 @@ class FoodDetector(context: Context) {
         // 모델의 입력값을 저장할 TensorImage 생성
         inputImage = TensorImage(inputTensor.dataType())
 
-        // 4-2. 추론: 모델의 출력값을 저장할 TensorBuffer 생성
-        // ========================================================================================
         // 모델 출력값 참조
         val outputTensorBoxes = model.getOutputTensor(0)
         val outputTensorScores = model.getOutputTensor(1)
         val outputTensorClasses = model.getOutputTensor(2)
         val outputTensorNums = model.getOutputTensor(3)
-        // ========================================================================================
         // 모델의 반환값을 저장할 텐서 버퍼 생성
         // 모델이 반환하는 텐서와 형상/데이터 타입이 일치해야 함. (텐서버퍼는 현재 FLOAT32와 UINT8 데이터 타입만 지원)
         Log.i("FoodDetector", "${outputTensorBoxes.shape()}, ${outputTensorBoxes.dataType()}")
@@ -185,7 +179,7 @@ class FoodDetector(context: Context) {
         val foodList = Array(numsList[0]) {""}
         for (i in 0 until numsList[0]){
             // 탐지된 객체 + 확률 전달
-            val str = "${labelList[classesList[i].toInt()]}" + "\t" + "${(scoresList[i]*10000).roundToInt()/100f}%"
+            val str = labelList[classesList[i].toInt()] + "\t" + "${(scoresList[i]*10000).roundToInt()/100f}%"
             foodList[i] = str
         }
         // 객체탐지박스 좌표 리스트, 음식_확률 리스트
