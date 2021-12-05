@@ -166,10 +166,10 @@ class PhotoFragment : Fragment() {
 //
 //            canvas = drawOnCanvas(canvas,w*xmin, h*ymin, w*xmax, h*ymax, foodList[i])
 //        }
-        for (i in customCoorList.indices){
-            val (xmin,ymin,xmax,ymax) = customCoorList[i]
-            canvas = drawOnCanvas(canvas,w*xmin/imageX, h*ymin/imageY, w*xmax/imageX, h*ymax/imageY, customFoodList[i])
-        }
+//        for (i in customCoorList.indices){
+//            val (xmin,ymin,xmax,ymax) = customCoorList[i]
+//            canvas = drawOnCanvas(canvas,w*xmin/imageX, h*ymin/imageY, w*xmax/imageX, h*ymax/imageY, customFoodList[i])
+//        }
         binding.imageViewPhoto.setImageDrawable(BitmapDrawable(resources, tmpBitmap))
 
         // 리사이클러 뷰 출력
