@@ -137,12 +137,12 @@ class PhotoFragment : Fragment() {
             }
             MainActivity.STEAK_AND_PASTA -> { // x: 512, 362
                 // 크림파스타: (241,17,476,214), 스테이크: (93,119,355,341)
-                imageX = 512
-                imageY = 362
+                imageX = 760
+                imageY = 500
                 customCoorList = listOf(
-                    floatArrayOf(241.0f,17.0f,476.0f,214.0f),
-                    floatArrayOf(93.0f,119.0f,355.0f,341.0f))
-                customFoodList = listOf("크림파스타\t97.13%","스테이크\t83.8%")
+                    floatArrayOf(374.0f,32.0f,672.0f,294.0f),
+                    floatArrayOf(4.0f,210.0f,362.0f,484.0f))
+                customFoodList = listOf("크림파스타\t97.13%","스테이크\t93.8%")
 
             }
             MainActivity.PIZZA -> { // x: 635, 415
@@ -152,6 +152,18 @@ class PhotoFragment : Fragment() {
                 customCoorList = listOf(
                     floatArrayOf(67.0f,9.0f,615.0f,408.0f))
                 customFoodList = listOf("피자\t99.48%")
+
+            }
+            MainActivity.MY_DIET -> { // x: 635, 415
+                // 피자: (67,5,615,408)
+                imageX = 1278
+                imageY = 1278
+                customCoorList = listOf(
+                    floatArrayOf(122.0f,668.0f,514.0f,1042.0f),
+                    floatArrayOf(100.0f,130.0f,474.0f,500.0f),
+                    floatArrayOf(654.0f,136.0f,1108.0f,570.0f),
+                    floatArrayOf(634.0f,676.0f,1046.0f,1110.0f))
+                customFoodList = listOf("쌀밥\t99.15%","배추김치\t97.38%","순대볶음\t71.95%","시래기된장국\t61.06%")
 
             }
         }
@@ -206,10 +218,16 @@ class PhotoFragment : Fragment() {
             }
             MainActivity.STEAK_AND_PASTA -> {
                 data.add(PhotoItem(1,"크림파스타\t97.13%", null))
-                data.add(PhotoItem(2,"스테이크\t83.8%", null))
+                data.add(PhotoItem(2,"스테이크\t93.8%", null))
             }
             MainActivity.PIZZA -> {
                 data.add(PhotoItem(1,"피자\t99.48%", null))
+            }
+            MainActivity.MY_DIET -> {
+                data.add(PhotoItem(1,"쌀밥\t99.15%", null))
+                data.add(PhotoItem(2,"배추김치\t97.38%", null))
+                data.add(PhotoItem(3,"순대볶음\t71.95%", null))
+                data.add(PhotoItem(4,"시래기된장국\t61.06%", null))
             }
         }
 

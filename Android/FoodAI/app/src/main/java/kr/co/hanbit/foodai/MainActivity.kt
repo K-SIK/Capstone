@@ -27,10 +27,11 @@ class MainActivity : BaseActivity() {
         const val POPUP_ACTIVITY = 103 // 팝업 액티비티 호출
 
         // 이미지 Uri
-        const val GEUPSIK = "content://com.android.providers.media.documents/document/image%3A32"
-        const val HAMBURGER_AND_FRIES = "content://com.android.providers.media.documents/document/image%3A34"
-        const val STEAK_AND_PASTA = "content://com.android.providers.media.documents/document/image%3A36"
-        const val PIZZA = "content://com.android.providers.media.documents/document/image%3A38"
+        const val GEUPSIK = "content://com.android.providers.media.documents/document/image%3A7829"
+        const val HAMBURGER_AND_FRIES = "content://com.android.providers.media.documents/document/image%3A7831"
+        const val STEAK_AND_PASTA = "content://com.android.providers.media.documents/document/image%3A7830"
+        const val PIZZA = "content://com.android.providers.media.documents/document/image%3A7832"
+        const val MY_DIET = "content://com.android.providers.media.documents/document/image%3A7854"
 
     }
 
@@ -70,7 +71,7 @@ class MainActivity : BaseActivity() {
                 }
                 R.id.tabAR -> {
                     // TODO: AR 기능
-                    Toast.makeText(this@MainActivity, "'AR' 기능 구현 전!", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this@MainActivity, "'AR' 기능 구현 전!", Toast.LENGTH_SHORT).show()
                 }
                 R.id.tabHome -> {
                     // 다른 프래그먼트 화면으로 이동하는 기능
@@ -273,7 +274,7 @@ class MainActivity : BaseActivity() {
     private fun setPhotoFragment(data: Triple<Pair<Uri?, Bitmap?>, FloatArray, Array<String>>){
         photoFragment = PhotoFragment()
         Log.d("MainActivity", "set Photo Fragment")
-        Toast.makeText(this, "잠시만 기다려주세요...", Toast.LENGTH_LONG).show()
+        // Toast.makeText(this, "잠시만 기다려주세요...", Toast.LENGTH_LONG).show()
 
         // 번들을 생성하고 전달할 값을 담는다.
         var bundle = Bundle()
